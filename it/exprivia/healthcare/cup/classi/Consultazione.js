@@ -199,7 +199,7 @@ class Consultazione {
   getListaDisponibilita () {
     var t = this
 
-    return new Promise((resolve, reject) => {
+    return new Promise(async function(resolve, reject) {
       const varWebServicesHCup = new WebServicesHCup()
       const listaAppuntamenti = varWebServicesHCup.getListaDisponibilita(t._arrDati[0], t._arrDati[2])
       resolve(listaAppuntamenti)
@@ -213,7 +213,7 @@ class Consultazione {
   getNoteAvvertenze () {
     var t = this
 
-    return new Promise((resolve, reject) => {
+    return new Promise(async function(resolve, reject) {
       const varWebServicesHCup = new WebServicesHCup()
       const noteAvvertenze = varWebServicesHCup.getNoteAvvertenze()
       resolve(noteAvvertenze)
