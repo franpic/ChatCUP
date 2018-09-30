@@ -221,14 +221,15 @@ async function handleMessage (senderPsid, receivedMessage) {
           risposta = {
             'text': varConsultazioni[senderPsid]['consultazione'].getFraseFormatoDatoErrato()
           }
+          await callSendAPI(senderPsid, risposta)
         }
       } else {
         console.log('Non mi aspettavo solo del testo')
         risposta = {
           'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu mi digiti o mandi un\'immagine del dato'
         }
+        await callSendAPI(senderPsid, risposta)
       }
-      await callSendAPI(senderPsid, risposta)
     }
   }
 
