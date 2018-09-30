@@ -210,7 +210,7 @@ class Consultazione {
       })
   }
 
-  getListaDisponibilita () {
+  getNoteAvvertenze () {
     var t = this
 
     return new Promise((resolve, reject) => {
