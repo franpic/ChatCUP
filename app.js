@@ -252,9 +252,13 @@ async function handleMessage (senderPsid, receivedMessage) {
       }
 
       risposta = {
-        'payload': {
-          'template_type': 'generic',
-          'elements': elementi
+        'attachment': {
+          'type': 'template',
+          'payload': {
+            'template_type': 'generic',
+            'elements': elementi
+          }
+
         }
       }
       await callSendAPI(senderPsid, risposta)
