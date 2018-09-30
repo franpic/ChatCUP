@@ -311,10 +311,44 @@ async function handlePostback (senderPsid, receivedPostback) {
       }
       await callSendAPI(senderPsid, risposta)
     }
+  } else if (payload === 'siPrenota') {
+    risposta = {
+      'text': 'Hai prenotato, grazie!'
+    }
+    await callSendAPI(senderPsid, risposta)
+
+    delete varConsultazioni[senderPsid]['consultazione']
+
+  } else if (payload === 'noPrenota') {
+    risposta = {
+      'text': 'Non hai prenotato, grazie!'
+    }
+    await callSendAPI(senderPsid, risposta)
+
+    delete varConsultazioni[senderPsid]['consultazione']
+
   } else if (payload.includes('sceltaAppuntamento')) {
     sTesto = 'Note ed Avvertenze:\n' + varConsultazioni[senderPsid]['consultazione'].getNoteAvvertenze()
     risposta = {
       'text': sTesto
+    }
+    await callSendAPI(senderPsid, risposta)
+
+    sTesto = 'Confermi la prenotazione?'
+    risposta = {
+      'text': sTesto,
+      "quick_replies":[
+        {
+          "content_type":"text",
+          "title":"Si",
+          "payload":"siPrenota",
+        },
+        {
+          "content_type":"text",
+          "title":"No",
+          "payload":"noPrenota",
+        }
+      ]
     }
     await callSendAPI(senderPsid, risposta)
 
@@ -325,7 +359,6 @@ async function handlePostback (senderPsid, receivedPostback) {
     }
   
     await callSendAPI(senderPsid, risposta)
-    break
   }
 
   _chiediProssimoDato(senderPsid)
