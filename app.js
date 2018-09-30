@@ -291,7 +291,7 @@ async function handlePostback (senderPsid, receivedPostback) {
       if (debug === true) {
         await varConsultazioni[senderPsid]["consultazione"].setValoreInDato("PCCFNC88C20F262P")
         await varConsultazioni[senderPsid]["consultazione"].setValoreInDato("1234567890123456")
-        await handleMessage(senderPsid, "160A41234567890")
+        await handleMessage(senderPsid, {"text": "160A41234567890"})
 
       } else {
         var sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
