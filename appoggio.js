@@ -1,17 +1,15 @@
 'use strict'
 
 const WebServicesHCup = require('./it/exprivia/healthcare/cup/classi/WebServicesHCup.js')
-const CodiceFiscale = require('./it/exprivia/healthcare/cup/classi/Dati/CodiceFiscale.js')
-const NumeroRicettaElettronica = require('./it/exprivia/healthcare/cup/classi/Dati/NumeroRicettaElettronica')
-
+// const CodiceFiscale = require('./it/exprivia/healthcare/cup/classi/Dati/CodiceFiscale.js')
+// const NumeroRicettaElettronica = require('./it/exprivia/healthcare/cup/classi/Dati/NumeroRicettaElettronica')
 
 async function main () {
   const varWebServicesHCup = new WebServicesHCup()
-  const risultato = await varWebServicesHCup.getListaDisponibilita("")
+  const risultato = await varWebServicesHCup.getListaDisponibilita('')
 
   console.log(JSON.stringify(risultato))
 }
-
 
 /* async function main () {
   var d = new CodiceFiscale()

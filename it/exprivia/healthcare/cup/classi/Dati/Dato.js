@@ -206,20 +206,20 @@ class Dato {
       request(options, (error, response, body) => {
         if (error) {
           console.error(error.stack)
-          reject(null)
+          reject(new Error(null))
         } else {
           if (body === undefined) {
-            reject(null)
+            reject(new Error(null))
           } else {
             resolve(JSON.stringify(body, null, 2))
           }
         }
       })
     })
-    .catch(error => {
-      console.error('ErroreAzure: ' + error)
-      return null
-    })
+      .catch(error => {
+        console.error('ErroreAzure: ' + error)
+        return null
+      })
   }
 
   /**
@@ -253,17 +253,17 @@ class Dato {
               buffer: body
             })
           } catch (errore) {
-            reject(null)
+            reject(new Error(null))
           }
         } else {
           console.error('Errore: ' + err)
-          reject(null)
+          reject(new Error(null))
         }
       })
     })
-    .catch(errore => {
-      return null
-    })
+      .catch(errore => {
+        return null
+      })
   }
 
   /**
@@ -279,7 +279,7 @@ class Dato {
 
       const tipoEBufferImmagine = await t.__getTipoEBufferImmagineDaUrl(urlImmagine)
       if (tipoEBufferImmagine === null) {
-        reject(null)
+        reject(new Error(null))
       } else {
         const bufferImmagine = tipoEBufferImmagine['buffer']
         const image = new dv.Image(tipoEBufferImmagine['tipoImmagine'], bufferImmagine)
@@ -287,15 +287,15 @@ class Dato {
         zxing.tryHarder = true
         const codiceDaZxing = zxing.findCode()
         if (codiceDaZxing === null) {
-          reject(null)
+          reject(new Error(null))
         } else {
           resolve(codiceDaZxing['data'])
         }
       }
     })
-    .catch(errore => {
-      return null
-    })
+      .catch(errore => {
+        return null
+      })
   }
 
   /**
@@ -315,7 +315,7 @@ class Dato {
       const tesseract = new dv.Tesseract('eng', image)
       const risultato = tesseract.findText('plain')
       if (risultato === null) {
-        reject(null)
+        reject(new Error(null))
       } else {
         resolve(risultato)
       }
@@ -345,7 +345,7 @@ class Dato {
           this.regexAmbigua.lastIndex = 0
           match = this.regexAmbigua.exec(match)
           if (match.length === 1) {
-            valorePresunto = match[0]  
+            valorePresunto = match[0]
           } else {
             for (var i = 1; i < match.length; i++) {
               valorePresunto = valorePresunto + match[i]
@@ -353,21 +353,21 @@ class Dato {
           }
 
           valorePresunto = this._correggiCifreELettere(valorePresunto, this.sTipiCaratteriAttesi)
-          valorePresunto = valorePresunto.toUpperCase()          
+          valorePresunto = valorePresunto.toUpperCase()
           if (this.regexStretta.test(valorePresunto) === true) {
             valoriValidi.push(valorePresunto)
           }
         }
         if (valoriValidi.length === 0) {
-          reject(null)
+          reject(new Error(null))
         } else {
           resolve(valoriValidi)
         }
       }
     })
-    .catch(errore => {
-      return null
-    })
+      .catch(errore => {
+        return null
+      })
   }
 
   /**
@@ -389,7 +389,7 @@ class Dato {
         if (valorePresunto === null) {
           valorePresunto = await t._getValoriDaTesto(await t._getTestoDaImmagineConAzureOCR(percorsoImmagine))
           if (valorePresunto === null) {
-            reject(null)
+            reject(new Error(null))
           } else {
             resolve(valorePresunto)
           }

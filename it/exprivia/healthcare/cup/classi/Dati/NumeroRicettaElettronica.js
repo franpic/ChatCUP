@@ -9,7 +9,7 @@ class NumeroRicettaElettronica extends Dato {
       'il',
       'del',
       'https://raw.githubusercontent.com/franpic/BotFBCupExprivia/master/Immagini/presentazioneDati/RicettaElettronicaNumIndicato.jpg',
-      /(?:\*|\")(\w{5})(?:\n|.)*?(?:\*|\")(\w{10})/g,
+      /(?:\*|")(\w{5})(?:\n|.)*?(?:\*|")(\w{10})/g,
       /^160\w{2}\d{10}$/,
       'CCCCCCCCCCCCCCC'
     )

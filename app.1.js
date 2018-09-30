@@ -35,7 +35,7 @@ app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'))
 // Accetta le richieste GET fatte alla rotta /webhook
 app.get('/webhook', (req, res) => {
   const VERIFY_TOKEN = process.env.VERIFY_TOKEN
-  
+
   // Analizza i parametri della richiesta di verifica del webhook
   let mode = req.query['hub.mode']
   let token = req.query['hub.verify_token']
@@ -147,9 +147,9 @@ function _getNomeDaPsid (senderPsid) {
       }
     })
   })
-  .catch((errore) => {
-    return null
-  })
+    .catch((errore) => {
+      return null
+    })
 }
 
 /**
@@ -173,7 +173,6 @@ async function handleMessage (senderPsid, receivedMessage) {
 
       varConsultazioni[senderPsid]['consultazione'].setValoreInDato(payload)
       tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
-
     } else {
       console.log('Non mi aspettavo una quick reply')
       risposta = {
@@ -283,7 +282,7 @@ async function handlePostback (senderPsid, receivedPostback) {
       risposta = {
         'text': 'Mi spiace ma non ho capito'
       }
-      
+
       await callSendAPI(senderPsid, risposta)
       break
   }
@@ -301,7 +300,6 @@ function callSendAPI (senderPsid, risposta) {
   console.log('Entrato in CallSendApi')
 
   varConsultazioni[senderPsid]['ultimoMessaggio'] = risposta
-
 
   return new Promise((resolve, reject) => {
     // Costruisce il corpo del messaggio
@@ -329,7 +327,7 @@ function callSendAPI (senderPsid, risposta) {
       }
     })
   })
-  .catch(error => {
-    return false
-  })
+    .catch(error => {
+      return false
+    })
 }
