@@ -3,7 +3,7 @@
 var CodiceFiscale = require('./Dati/CodiceFiscale.js')
 var NumeroTesseraSanitaria = require('./Dati/NumeroTesseraSanitaria.js')
 var NumeroRicettaElettronica = require('./Dati/NumeroRicettaElettronica.js')
-var WebServicesHCup = require('/it/exprivia/healthcare/cup/classi/WebServicesHCup.js')
+var WebServicesHCup = require('WebServicesHCup.js')
 
 /**
  * Classe che rappresenta una Consultazione con tutti i suoi dati
