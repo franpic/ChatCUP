@@ -202,10 +202,10 @@ class WebServicesHCup {
     return new Promise(function (resolve, reject) {
       
       resolve({
-        "noteAvvertenze": "Non è necessario essere a digiuno ma è preferibile fare una colazione leggera\n" + 
-                "Per la prova è meglio indossare indumenti comodi\n" + 
-                "Si deve avvisare il personale di eventuali disturbi accusati nelle ultime 48 ore.\n" + 
-                "Presentarsi all'appuntamento con tutta la documentazione relativa a visite ed esami precedenti (ECG, visite cardiologiche, esami ematochimici ed altro)"
+        "noteAvvertenze": "- Non è necessario essere a digiuno ma è preferibile fare una colazione leggera\n" + 
+                "- Per la prova è meglio indossare indumenti comodi\n" + 
+                "- Si deve avvisare il personale di eventuali disturbi accusati nelle ultime 48 ore.\n" + 
+                "- Presentarsi all'appuntamento con tutta la documentazione relativa a visite ed esami precedenti (ECG, visite cardiologiche, esami ematochimici ed altro)"
       })
     })
       .catch(errore => {

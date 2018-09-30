@@ -313,7 +313,7 @@ async function handlePostback (senderPsid, receivedPostback) {
     }
   } else if (payload === 'siPrenota') {
     risposta = {
-      'text': 'Hai prenotato, grazie!'
+      'text': 'Hai prenotato, grazie per avermi contattato!'
     }
     await callSendAPI(senderPsid, risposta)
 
@@ -321,7 +321,7 @@ async function handlePostback (senderPsid, receivedPostback) {
 
   } else if (payload === 'noPrenota') {
     risposta = {
-      'text': 'Non hai prenotato, grazie!'
+      'text': 'Non hai prenotato, grazie per avermi contattato!'
     }
     await callSendAPI(senderPsid, risposta)
 
@@ -351,6 +351,8 @@ async function handlePostback (senderPsid, receivedPostback) {
       ]
     }
     await callSendAPI(senderPsid, risposta)
+
+    tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
 
 
   } else {
