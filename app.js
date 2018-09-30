@@ -57,7 +57,8 @@ app.get('/webhook', (req, res) => {
 
 // Accetta le richieste GET fatte alla rotta /webhook
 app.get('/NormativaPrivacy', (req, res) => {
-  res.status(200).send('https://github.com/franpic/ChatCUP/blob/master/informativaPrivacy.doc')
+  res.send('https://github.com/franpic/ChatCUP/blob/master/informativaPrivacy.doc')
+  res.status(200).send()
 })
 
 // Accetta le richieste POST fatte alla rotta /webhook
