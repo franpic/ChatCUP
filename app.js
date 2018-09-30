@@ -249,18 +249,18 @@ async function handleMessage (senderPsid, receivedMessage) {
             'payload': appuntamento
           }]
         })
+      }
 
-        risposta = {
-          'payload': {
-            'template_type': 'generic',
-            'elements': elementi
-          }
+      risposta = {
+        'payload': {
+          'template_type': 'generic',
+          'elements': elementi
         }
       }
       await callSendAPI(senderPsid, risposta)
 
       risposta = {
-        'text': 'Hai inserito tutti i dati, grazie!'
+        'text': 'Abbiamo finito, grazie!'
       }
       await callSendAPI(senderPsid, risposta)
 
