@@ -4,6 +4,7 @@
  *
  */
 
+ 
 /**
  * Gestisce la conversazione con un utente
  *
