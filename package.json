@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/franpic/BotFBCupExprivia.git"
+    "url": "git+https://github.com/franpic/chatcup.git"
   },
   "author": "Francesco Piccolomini",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/franpic/BotFBCupExprivia/issues"
+    "url": "https://github.com/franpic/chatcup/issues"
   },
-  "homepage": "https://github.com/franpic/BotFBCupExprivia#readme",
+  "homepage": "https://github.com/franpic/chatcup#readme",
   "dependencies": {
     "async": "^2.6.1",
     "azure-arm-cognitiveservices": "^2.2.0",
