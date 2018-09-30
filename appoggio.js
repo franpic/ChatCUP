@@ -3,12 +3,36 @@
 const WebServicesHCup = require('./it/exprivia/healthcare/cup/classi/WebServicesHCup.js')
 // const CodiceFiscale = require('./it/exprivia/healthcare/cup/classi/Dati/CodiceFiscale.js')
 // const NumeroRicettaElettronica = require('./it/exprivia/healthcare/cup/classi/Dati/NumeroRicettaElettronica')
+const Consultazione = require('./it/exprivia/healthcare/cup/classi/Consultazione.js')
 
 async function main () {
-  const varWebServicesHCup = new WebServicesHCup()
-  const risultato = await varWebServicesHCup.getListaDisponibilita('')
+  const varConsultazione = new Consultazione()
+//  const varWebServicesHCup = new WebServicesHCup()
+  const listaAppuntamenti = await varConsultazione.getListaDisponibilita()
+  console.log(listaAppuntamenti)
 
-  console.log(JSON.stringify(risultato))
+  var elementi = []
+  var risposta = {}
+  for (var appuntamento of listaAppuntamenti) {
+    elementi.push({
+      'title': appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
+      'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
+      'buttons': [{
+        'type': 'postback',
+        'title': 'Prenota',
+        'payload': appuntamento
+      }]
+    })
+
+    risposta = {
+      'payload': {
+        'template_type': 'generic',
+        'elements': elementi
+      }
+    }
+  }
+
+  console.log(risposta)
 }
 
 /* async function main () {
