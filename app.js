@@ -286,23 +286,28 @@ async function handlePostback (senderPsid, receivedPostback) {
     case 'inizia':
       varConsultazioni[senderPsid] = {consultazione: new Consultazione(), ultimiValoriRiconosciuti: '', ultimoMessaggio: ''}
 
-      //Inseriti questi 3 comandi per evitare che vengano chiesti durante il debug
-      varConsultazioni[senderPsid]["consultazione"].setValoreInDato("PCCFNC88C20F262P")
-      varConsultazioni[senderPsid]["consultazione"].setValoreInDato("1234567890123456")
-      varConsultazioni[senderPsid]["consultazione"].setValoreInDato("160A41234567890")
+      var debug = true
 
-      var sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
+      if (debug === true) {
+        varConsultazioni[senderPsid]["consultazione"].setValoreInDato("PCCFNC88C20F262P")
+        varConsultazioni[senderPsid]["consultazione"].setValoreInDato("1234567890123456")
+        await handleMessage(senderPsid, "160A41234567890")
 
-      risposta = {
-        'text': sTesto
+      } else {
+        var sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
+  
+        risposta = {
+          'text': sTesto
+        }
+        await callSendAPI(senderPsid, risposta)
+  
+        sTesto = 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' + varConsultazioni[senderPsid]['consultazione'].getListaDati()
+        risposta = {
+          'text': sTesto
+        }
+        await callSendAPI(senderPsid, risposta)
       }
-      await callSendAPI(senderPsid, risposta)
 
-      sTesto = 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' + varConsultazioni[senderPsid]['consultazione'].getListaDati()
-      risposta = {
-        'text': sTesto
-      }
-      await callSendAPI(senderPsid, risposta)
       break
 
     default:
