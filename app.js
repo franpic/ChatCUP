@@ -287,9 +287,9 @@ async function handlePostback (senderPsid, receivedPostback) {
       varConsultazioni[senderPsid] = {consultazione: new Consultazione(), ultimiValoriRiconosciuti: '', ultimoMessaggio: ''}
 
       //Inseriti questi 3 comandi per evitare che vengano chiesti durante il debug
-      varConsultazioni[senderPsid]["consultazione"].setValoreInDato("")
-      varConsultazioni[senderPsid]["consultazione"].setValoreInDato("")
-      varConsultazioni[senderPsid]["consultazione"].setValoreInDato("")
+      varConsultazioni[senderPsid]["consultazione"].setValoreInDato("PCCFNC88C20F262P")
+      varConsultazioni[senderPsid]["consultazione"].setValoreInDato("1234567890123456")
+      varConsultazioni[senderPsid]["consultazione"].setValoreInDato("160A41234567890")
 
       var sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
 
