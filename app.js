@@ -285,6 +285,8 @@ async function handlePostback (senderPsid, receivedPostback) {
   switch (payload) {
     case 'inizia':
       varConsultazioni[senderPsid] = {consultazione: new Consultazione(), ultimiValoriRiconosciuti: '', ultimoMessaggio: ''}
+
+      //Inseriti questi 3 comandi per evitare che vengano chiesti durante il debug
       varConsultazioni[senderPsid]["consultazione"].setValoreInDato("")
       varConsultazioni[senderPsid]["consultazione"].setValoreInDato("")
       varConsultazioni[senderPsid]["consultazione"].setValoreInDato("")
