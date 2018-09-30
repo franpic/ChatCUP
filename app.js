@@ -247,7 +247,7 @@ async function handleMessage (senderPsid, receivedMessage) {
           'buttons': [{
             'type': 'postback',
             'title': 'Prenota',
-            'payload': appuntamento.toLocaleString()
+            'payload': "sceltaAppuntamento " + appuntamento.toLocaleString()
           }]
         })
       }

@@ -191,6 +191,28 @@ class WebServicesHCup {
         return errore
       })
   }
+
+  /**
+   * @todo ATTENZIONE! QUESTO E' UNO STUB DA MODIFICARE IL PRIMA POSSIBILE!
+   * 
+   */
+  getNoteAvvertenze () {
+    var t = this
+
+    return new Promise(function (resolve, reject) {
+      
+      resolve({
+        "note": "Non è necessario essere a digiuno ma è preferibile fare una colazione leggera\n" + 
+                "Per la prova è meglio indossare indumenti comodi\n" + 
+                "Si deve avvisare il personale di eventuali disturbi accusati nelle ultime 48 ore.\n" + 
+                "Presentarsi all'appuntamento con tutta la documentazione relativa a visite ed esami precedenti (ECG, visite cardiologiche, esami ematochimici ed altro)"
+      })
+    })
+      .catch(errore => {
+        console.error(errore)
+        return errore
+      })
+  }
 }
 
 module.exports = WebServicesHCup
