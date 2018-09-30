@@ -216,7 +216,7 @@ class Consultazione {
     return new Promise(async function(resolve, reject) {
       const varWebServicesHCup = new WebServicesHCup()
       const noteAvvertenze = await varWebServicesHCup.getNoteAvvertenze()
-      resolve(noteAvvertenze)
+      resolve(noteAvvertenze['noteAvvertenze'])
     })
       .catch(errore => {
         console.error(errore)
