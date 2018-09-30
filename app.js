@@ -285,10 +285,12 @@ async function handlePostback (senderPsid, receivedPostback) {
   switch (payload) {
     case 'inizia':
       varConsultazioni[senderPsid] = {consultazione: new Consultazione(), ultimiValoriRiconosciuti: '', ultimoMessaggio: ''}
+      varConsultazioni[senderPsid]["consultazione"].setValoreInDato("")
+      varConsultazioni[senderPsid]["consultazione"].setValoreInDato("")
+      varConsultazioni[senderPsid]["consultazione"].setValoreInDato("")
 
-      var sTesto = ''
+      var sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
 
-      sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
       risposta = {
         'text': sTesto
       }
