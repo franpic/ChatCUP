@@ -264,12 +264,12 @@ async function handleMessage (senderPsid, receivedMessage) {
       }
       await callSendAPI(senderPsid, risposta)
 
-      risposta = {
+/*      risposta = {
         'text': 'Abbiamo finito, grazie!'
       }
       await callSendAPI(senderPsid, risposta)
 
-      delete varConsultazioni[senderPsid]['consultazione']
+      delete varConsultazioni[senderPsid]['consultazione']*/
     }
   }
 }
@@ -287,41 +287,45 @@ async function handlePostback (senderPsid, receivedPostback) {
   let payload = receivedPostback.payload
 
   // Imposta la risposta basata sul payload del postback
-  switch (payload) {
-    case 'inizia':
-      varConsultazioni[senderPsid] = {consultazione: new Consultazione(), ultimiValoriRiconosciuti: '', ultimoMessaggio: ''}
-
-      var debug = true
-
-      if (debug === true) {
-        await varConsultazioni[senderPsid]["consultazione"].setValoreInDato("PCCFNC88C20F262P")
-        await varConsultazioni[senderPsid]["consultazione"].setValoreInDato("1234567890123456")
-        await handleMessage(senderPsid, {"text": "160A41234567890"})
-
-      } else {
-        var sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
+  if (payload === 'inizia') {
+    varConsultazioni[senderPsid] = {consultazione: new Consultazione(), ultimiValoriRiconosciuti: '', ultimoMessaggio: ''}
   
-        risposta = {
-          'text': sTesto
-        }
-        await callSendAPI(senderPsid, risposta)
+    var debug = true
   
-        sTesto = 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' + varConsultazioni[senderPsid]['consultazione'].getListaDati()
-        risposta = {
-          'text': sTesto
-        }
-        await callSendAPI(senderPsid, risposta)
-      }
-
-      break
-
-    default:
+    if (debug === true) {
+      await varConsultazioni[senderPsid]["consultazione"].setValoreInDato("PCCFNC88C20F262P")
+      await varConsultazioni[senderPsid]["consultazione"].setValoreInDato("1234567890123456")
+      await handleMessage(senderPsid, {"text": "160A41234567890"})
+  
+    } else {
+      var sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
+  
       risposta = {
-        'text': 'Mi spiace ma non ho capito'
+        'text': sTesto
       }
-
       await callSendAPI(senderPsid, risposta)
-      break
+  
+      sTesto = 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' + varConsultazioni[senderPsid]['consultazione'].getListaDati()
+      risposta = {
+        'text': sTesto
+      }
+      await callSendAPI(senderPsid, risposta)
+    }
+  } else if (payload.includes('sceltaAppuntamento')) {
+    sTesto = 'Note ed Avvertenze:\n' + varConsultazioni[senderPsid]['consultazione'].getNoteAvvertenze()
+    risposta = {
+      'text': sTesto
+    }
+    await callSendAPI(senderPsid, risposta)
+
+
+  } else {
+    risposta = {
+      'text': 'Mi spiace ma non ho capito'
+    }
+  
+    await callSendAPI(senderPsid, risposta)
+    break
   }
 
   _chiediProssimoDato(senderPsid)

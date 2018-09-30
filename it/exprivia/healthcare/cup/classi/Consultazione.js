@@ -209,6 +209,22 @@ class Consultazione {
         return errore
       })
   }
+
+  getListaDisponibilita () {
+    var t = this
+
+    return new Promise((resolve, reject) => {
+      const varWebServicesHCup = new WebServicesHCup()
+      const noteAvvertenze = varWebServicesHCup.getNoteAvvertenze()
+      resolve(noteAvvertenze)
+    })
+      .catch(errore => {
+        console.error(errore)
+        return errore
+      })
+  }
+
+  
 }
 
 module.exports = Consultazione
