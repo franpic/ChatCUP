@@ -328,7 +328,7 @@ async function handlePostback (senderPsid, receivedPostback) {
     delete varConsultazioni[senderPsid]['consultazione']
 
   } else if (payload.includes('sceltaAppuntamento')) {
-    sTesto = 'Note ed Avvertenze:\n' + varConsultazioni[senderPsid]['consultazione'].getNoteAvvertenze()
+    sTesto = 'Note ed Avvertenze:\n' + await varConsultazioni[senderPsid]['consultazione'].getNoteAvvertenze()
     risposta = {
       'text': sTesto
     }
