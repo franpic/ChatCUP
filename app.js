@@ -236,7 +236,7 @@ async function handleMessage (senderPsid, receivedMessage) {
     if (varConsultazioni[senderPsid]['consultazione'].hasProssimoDatoDaChiedere() === true) {
       _chiediProssimoDato(senderPsid)
     } else {
-      var listaAppuntamenti = varConsultazioni[senderPsid]['consultazione'].getListaAppuntamenti()
+      var listaAppuntamenti = varConsultazioni[senderPsid]['consultazione'].getListaDisponibilita()
       var elementi = []
       risposta = {}
       for (var appuntamento of listaAppuntamenti) {
