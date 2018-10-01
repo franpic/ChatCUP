@@ -124,7 +124,7 @@ class WebServicesHCup {
         }
       ]
 //      var numEsamiDaRestituire = Math.floor(Math.random() * dbEsami.length) + 1
-      var numEsamiDaRestituire = 1
+      var numEsamiDaRestituire = 2
       var esamiDaRestituire = []
 
       for (var i = 0; i < numEsamiDaRestituire; i++) {
@@ -213,6 +213,10 @@ class WebServicesHCup {
         console.error(errore)
         return errore
       })
+  }
+
+  setPrenota(isConfermato) {
+    return isConfermato
   }
 }
 

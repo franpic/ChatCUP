@@ -19,6 +19,9 @@ class Consultazione {
       new NumeroTesseraSanitaria(),
       new NumeroRicettaElettronica()
     ]
+
+    this._ultimiValoriRiconosciutiDaOcr = null
+    this._ultimiEsamiEstrattiDaRicetta = null
   }
 
   /**
@@ -147,7 +150,8 @@ class Consultazione {
     if (dato === null) {
       return null
     } else {
-      return dato.getPossibiliValoriDaImmagine(percorso)
+      this._ultimiValoriRiconosciutiDaOcr = dato.getPossibiliValoriDaImmagine(percorso)
+      return this._ultimiValoriRiconosciutiDaOcr
     }
   }
 
@@ -196,12 +200,63 @@ class Consultazione {
     }
   }
 
+  _getProssimoAppuntamentoDaPrenotare() {
+    var iEsami = 0
+    var trovato = false
+    var prossimoEsame = null
+
+    while (iEsami < this._ultimiEsamiEstrattiDaRicetta.length && trovato === false) {
+      if (this._ultimiEsamiEstrattiDaRicetta[iEsami].getValore() === '') {
+        prossimoEsame = this._ultimiEsamiEstrattiDaRicetta[iEsami]
+        trovato = true
+      } else {
+        iEsami = iEsami + 1
+      }
+    }
+
+    return prossimoEsame
+  } 
+
+  isListaEsamiPopolata() {
+    if (this._ultimiEsamiEstrattiDaRicetta === null) {
+      return false
+    } else {
+      return true
+    }
+  }
+
+
+  hasProssimoAppuntamentoDaPrenotare () {
+    var esame = this._getProssimoAppuntamentoDaPrenotare()
+
+    if (esame === null) {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  prenotaEsame(isConfermato) {
+    var esame = this._getProssimoAppuntamentoDaPrenotare()
+
+    if (esame === null) {
+      return false
+    } else {
+        esame['isPrenotato'] = WebServicesHCup.setPrenota(isConfermato)
+        return esame['isPrenotato']
+    }
+  }
+
   getPrescrizioneElettronica () {
     var t = this
 
     return new Promise(async function(resolve, reject) {
       const varWebServicesHCup = new WebServicesHCup()
       const listaEsami = await varWebServicesHCup.getPrescrizioneElettronica(t._arrDati[0], t._arrDati[2])
+      for (var esame of listaEsami) {
+        esame['isPrenotato'] = false
+      }
+      this._ultimiEsamiEstrattiDaRicetta = listaEsami
       resolve(listaEsami)
     })
       .catch(errore => {
