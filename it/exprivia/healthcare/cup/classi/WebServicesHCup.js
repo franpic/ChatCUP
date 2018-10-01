@@ -123,7 +123,8 @@ class WebServicesHCup {
           'codCatalogoPrescr': Math.floor(Math.random() * 100000)
         }
       ]
-      var numEsamiDaRestituire = Math.floor(Math.random() * 2) + 1
+//      var numEsamiDaRestituire = Math.floor(Math.random() * dbEsami.length) + 1
+      var numEsamiDaRestituire = 1
       var esamiDaRestituire = []
 
       for (var i = 0; i < numEsamiDaRestituire; i++) {
