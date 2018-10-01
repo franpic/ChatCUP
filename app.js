@@ -262,9 +262,7 @@ async function handleMessage (senderPsid, receivedMessage) {
     }
   }
   
-  if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
-    _chiediProssimoDato(senderPsid)
-  } else {
+ else {
     if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
       if (receivedMessage.quick_reply) {
         if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
