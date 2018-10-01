@@ -171,8 +171,27 @@ async function handleMessage (senderPsid, receivedMessage) {
       // Recupera il payload della quick_reply
       let payload = receivedMessage.quick_reply.payload
 
-      varConsultazioni[senderPsid]['consultazione'].setValoreInDato(payload)
-      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
+      if (payload === 'siPrenota') {
+        risposta = {
+          'text': 'Hai prenotato, grazie per avermi contattato!'
+        }
+        await callSendAPI(senderPsid, risposta)
+    
+        delete varConsultazioni[senderPsid]['consultazione']
+    
+      } else if (payload === 'noPrenota') {
+        risposta = {
+          'text': 'Non hai prenotato, grazie per avermi contattato!'
+        }
+        await callSendAPI(senderPsid, risposta)
+    
+        delete varConsultazioni[senderPsid]['consultazione']
+      
+      } else {
+        varConsultazioni[senderPsid]['consultazione'].setValoreInDato(payload)
+        tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
+      }
+    
     } else {
       console.log('Non mi aspettavo una quick reply')
       risposta = {
@@ -314,22 +333,6 @@ async function handlePostback (senderPsid, receivedPostback) {
       _chiediProssimoDato(senderPsid)
 
     }
-  } else if (payload === 'siPrenota') {
-    risposta = {
-      'text': 'Hai prenotato, grazie per avermi contattato!'
-    }
-    await callSendAPI(senderPsid, risposta)
-
-    delete varConsultazioni[senderPsid]['consultazione']
-
-  } else if (payload === 'noPrenota') {
-    risposta = {
-      'text': 'Non hai prenotato, grazie per avermi contattato!'
-    }
-    await callSendAPI(senderPsid, risposta)
-
-    delete varConsultazioni[senderPsid]['consultazione']
-
   } else if (payload.includes('sceltaAppuntamento')) {
     sTesto = 'Note ed Avvertenze:\n' + await varConsultazioni[senderPsid]['consultazione'].getNoteAvvertenze()
     risposta = {
