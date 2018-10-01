@@ -8,7 +8,7 @@ class NumeroRicettaElettronica extends Dato {
       'Numero della Ricetta Elettronica',
       'il',
       'del',
-      'https://api.glitch.com/chatcup/git/Immagini/presentazioneDati/RicettaElettronicaNumIndicato.jpg',
+      'https://github.com/franpic/ChatCUP/blob/master/Immagini/presentazioneDati/RicettaElettronicaNumIndicato.jpg',
       /(?:\*|")(\w{5})(?:\n|.)*?(?:\*|")(\w{10})/g,
       /^160\w{2}\d{10}$/,
       'CCCCCCCCCCCCCCC'

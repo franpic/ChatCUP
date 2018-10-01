@@ -8,7 +8,7 @@ class NumeroTesseraSanitaria extends Dato {
       'Numero della Tessera Sanitaria',
       'il',
       'del',
-      'https://api.glitch.com/chatcup/git/Immagini/presentazioneDati/TesseraSanitariaNumIndicato.jpg',
+      'https://github.com/franpic/ChatCUP/blob/master/Immagini/presentazioneDati/TesseraSanitariaNumIndicato.jpg',
       /\w{20}/g,
       /^\d{20}$/,
       'CCCCCCCCCCCCCCCCCCCC'
