@@ -256,39 +256,43 @@ async function handleMessage (senderPsid, receivedMessage) {
     if (varConsultazioni[senderPsid]['consultazione'].hasProssimoDatoDaChiedere() === true) {
       _chiediProssimoDato(senderPsid)
     } else {
-      var listaAppuntamenti = await varConsultazioni[senderPsid]['consultazione'].getListaDisponibilita()
-      var elementi = []
-      risposta = {}
-      for (var appuntamento of listaAppuntamenti) {
-        elementi.push({
-          'title': appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
-          'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
-          'buttons': [{
-            'type': 'postback',
-            'title': 'Prenota',
-            'payload': "sceltaAppuntamento " + appuntamento.toLocaleString()
-          }]
-        })
-      }
-
-      risposta = {
-        'attachment': {
-          'type': 'template',
-          'payload': {
-            'template_type': 'generic',
-            'elements': elementi
-          }
-
+      var listaEsami = await varConsultazioni[senderPsid]['consultazione'].getPrescrizioneElettronica()
+      for (var esame of listaEsami) {
+        var sTesto = 'Ecco gli appuntamenti per l\'esame ' + esame['decrProdPrest'] + ' con codici ' + esame['codProdPrest'] + ' (' + esame['codCatalogoPrescr'] + ')'
+        risposta = {
+          'text': sTesto
         }
-      }
-      await callSendAPI(senderPsid, risposta)
+        await callSendAPI(senderPsid, risposta)
+  
 
-/*      risposta = {
-        'text': 'Abbiamo finito, grazie!'
+        var listaAppuntamenti = await varConsultazioni[senderPsid]['consultazione'].getListaDisponibilita()
+        var elementi = []
+        risposta = {}
+  
+        for (var appuntamento of listaAppuntamenti) {
+          elementi.push({
+            'title': appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
+            'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
+            'buttons': [{
+              'type': 'postback',
+              'title': 'Prenota',
+              'payload': "sceltaAppuntamento " + appuntamento.toLocaleString()
+            }]
+          })
+        }
+  
+        risposta = {
+          'attachment': {
+            'type': 'template',
+            'payload': {
+              'template_type': 'generic',
+              'elements': elementi
+            }
+  
+          }
+        }
+        await callSendAPI(senderPsid, risposta)
       }
-      await callSendAPI(senderPsid, risposta)
-
-      delete varConsultazioni[senderPsid]['consultazione']*/
     }
   }
 }

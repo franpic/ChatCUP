@@ -58,7 +58,7 @@ app.get('/webhook', (req, res) => {
 // Accetta le richieste GET fatte alla rotta /webhook
 app.get('/NormativaPrivacy', (req, res) => {
   res.send('https://github.com/franpic/ChatCUP/blob/master/informativaPrivacy.doc')
-  res.status(200).send(challenge)
+  res.status(200).send()
 })
 
 // Accetta le richieste POST fatte alla rotta /webhook
@@ -140,7 +140,7 @@ function _getNomeDaPsid (senderPsid) {
         console.log('error:', error) // Print the error if one occurred
         console.log('statusCode:', response && response.statusCode) // Print the response status code if a response was received
         console.log('body:', body)
-        reject(null)
+        reject(new Error(null))
       } else {
         console.log(JSON.parse(body)['first_name'])
         resolve(JSON.parse(body)['first_name'])
@@ -171,8 +171,27 @@ async function handleMessage (senderPsid, receivedMessage) {
       // Recupera il payload della quick_reply
       let payload = receivedMessage.quick_reply.payload
 
-      varConsultazioni[senderPsid]['consultazione'].setValoreInDato(payload)
-      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
+      if (payload === 'siPrenota') {
+        risposta = {
+          'text': 'Hai prenotato, grazie per avermi contattato!'
+        }
+        await callSendAPI(senderPsid, risposta)
+    
+        delete varConsultazioni[senderPsid]['consultazione']
+    
+      } else if (payload === 'noPrenota') {
+        risposta = {
+          'text': 'Non hai prenotato, grazie per avermi contattato!'
+        }
+        await callSendAPI(senderPsid, risposta)
+    
+        delete varConsultazioni[senderPsid]['consultazione']
+      
+      } else {
+        varConsultazioni[senderPsid]['consultazione'].setValoreInDato(payload)
+        tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
+      }
+    
     } else {
       console.log('Non mi aspettavo una quick reply')
       risposta = {
@@ -221,14 +240,15 @@ async function handleMessage (senderPsid, receivedMessage) {
           risposta = {
             'text': varConsultazioni[senderPsid]['consultazione'].getFraseFormatoDatoErrato()
           }
+          await callSendAPI(senderPsid, risposta)
         }
       } else {
         console.log('Non mi aspettavo solo del testo')
         risposta = {
           'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu mi digiti o mandi un\'immagine del dato'
         }
+        await callSendAPI(senderPsid, risposta)
       }
-      await callSendAPI(senderPsid, risposta)
     }
   }
 
@@ -236,12 +256,33 @@ async function handleMessage (senderPsid, receivedMessage) {
     if (varConsultazioni[senderPsid]['consultazione'].hasProssimoDatoDaChiedere() === true) {
       _chiediProssimoDato(senderPsid)
     } else {
+      var listaAppuntamenti = await varConsultazioni[senderPsid]['consultazione'].getListaDisponibilita()
+      var elementi = []
+      risposta = {}
+      for (var appuntamento of listaAppuntamenti) {
+        elementi.push({
+          'title': appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
+          'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
+          'buttons': [{
+            'type': 'postback',
+            'title': 'Prenota',
+            'payload': "sceltaAppuntamento " + appuntamento.toLocaleString()
+          }]
+        })
+      }
+
       risposta = {
-        'text': 'Hai inserito tutti i dati, grazie!'
+        'attachment': {
+          'type': 'template',
+          'payload': {
+            'template_type': 'generic',
+            'elements': elementi
+          }
+
+        }
       }
       await callSendAPI(senderPsid, risposta)
 
-      delete varConsultazioni[senderPsid]['consultazione']
     }
   }
 }
@@ -259,35 +300,69 @@ async function handlePostback (senderPsid, receivedPostback) {
   let payload = receivedPostback.payload
 
   // Imposta la risposta basata sul payload del postback
-  switch (payload) {
-    case 'inizia':
-      varConsultazioni[senderPsid] = {consultazione: new Consultazione(), ultimiValoriRiconosciuti: '', ultimoMessaggio: ''}
-
-      var sTesto = ''
-
-      sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
+  if (payload === 'inizia') {
+    varConsultazioni[senderPsid] = {consultazione: new Consultazione(), ultimiValoriRiconosciuti: '', ultimoMessaggio: ''}
+  
+    var debug = false
+  
+    if (debug === true) {
+      await varConsultazioni[senderPsid]["consultazione"].setValoreInDato("PCCFNC88C20F262P")
+      await varConsultazioni[senderPsid]["consultazione"].setValoreInDato("1234567890123456")
+      await handleMessage(senderPsid, {"text": "160A41234567890"})
+  
+    } else {
+      var sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
+  
       risposta = {
         'text': sTesto
       }
       await callSendAPI(senderPsid, risposta)
-
+  
       sTesto = 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' + varConsultazioni[senderPsid]['consultazione'].getListaDati()
       risposta = {
         'text': sTesto
       }
       await callSendAPI(senderPsid, risposta)
-      break
 
-    default:
-      risposta = {
-        'text': 'Mi spiace ma non ho capito'
-      }
+      _chiediProssimoDato(senderPsid)
 
-      await callSendAPI(senderPsid, risposta)
-      break
+    }
+  } else if (payload.includes('sceltaAppuntamento')) {
+    sTesto = 'Note ed Avvertenze:\n' + await varConsultazioni[senderPsid]['consultazione'].getNoteAvvertenze()
+    risposta = {
+      'text': sTesto
+    }
+    await callSendAPI(senderPsid, risposta)
+
+    sTesto = 'Confermi la prenotazione?'
+    risposta = {
+      'text': sTesto,
+      "quick_replies":[
+        {
+          "content_type":"text",
+          "title":"Si",
+          "payload":"siPrenota",
+        },
+        {
+          "content_type":"text",
+          "title":"No",
+          "payload":"noPrenota",
+        }
+      ]
+    }
+    await callSendAPI(senderPsid, risposta)
+
+    tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
+
+
+  } else {
+    risposta = {
+      'text': 'Mi spiace ma non ho capito'
+    }
+  
+    await callSendAPI(senderPsid, risposta)
   }
 
-  _chiediProssimoDato(senderPsid)
 }
 
 /**
@@ -323,11 +398,12 @@ function callSendAPI (senderPsid, risposta) {
         resolve(true)
       } else {
         console.error('Unable to send message:' + err)
-        reject(false)
+        reject(new Error(false))
       }
     })
   })
-    .catch(error => {
+    .catch(errore => {
+      console.error(errore)
       return false
     })
 }

@@ -196,6 +196,20 @@ class Consultazione {
     }
   }
 
+  getPrescrizioneElettronica () {
+    var t = this
+
+    return new Promise(async function(resolve, reject) {
+      const varWebServicesHCup = new WebServicesHCup()
+      const listaEsami = await varWebServicesHCup.getPrescrizioneElettronica(t._arrDati[0], t._arrDati[2])
+      resolve(listaEsami)
+    })
+      .catch(errore => {
+        console.error(errore)
+        return errore
+      })
+  }
+
   getListaDisponibilita () {
     var t = this
 
