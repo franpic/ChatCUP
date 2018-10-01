@@ -7,7 +7,7 @@ const Consultazione = require('./it/exprivia/healthcare/cup/classi/Consultazione
 
 async function main () {
   const varConsultazione = new Consultazione()
-//  const varWebServicesHCup = new WebServicesHCup()
+  //  const varWebServicesHCup = new WebServicesHCup()
   const listaAppuntamenti = await varConsultazione.getListaDisponibilita()
   console.log(listaAppuntamenti)
 

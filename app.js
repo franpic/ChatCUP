@@ -127,7 +127,7 @@ function _chiediProssimoDato (senderPsid) {
   }
 }
 
-function _chiediProssimaPrenotazione(senderPsid) {
+async function _chiediProssimaPrenotazione (senderPsid) {
   var risposta = null
   var datiEsame = varConsultazioni[senderPsid].getDatiProssimoEsame()
   if (datiEsame !== null) {
@@ -136,7 +136,7 @@ function _chiediProssimaPrenotazione(senderPsid) {
       'text': 'Ecco gli appuntamenti per l\'esame ' + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
     }
     await callSendAPI(senderPsid, risposta)
-    
+
     var listaAppuntamenti = await varConsultazioni[senderPsid].getListaDisponibilita()
     var elementi = []
     risposta = {}
@@ -151,7 +151,7 @@ function _chiediProssimaPrenotazione(senderPsid) {
         'buttons': [{
           'type': 'postback',
           'title': 'Prenota',
-          'payload': "sceltaAppuntamento " + appuntamento.toLocaleString()
+          'payload': 'sceltaAppuntamento ' + appuntamento.toLocaleString()
         }]
       })
     }
@@ -168,11 +168,11 @@ function _chiediProssimaPrenotazione(senderPsid) {
     }
     await callSendAPI(senderPsid, risposta)
 
-    tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK 
+    tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
     return true
   } else {
     return false
-  }  
+  }
 }
 
 /**
@@ -221,7 +221,6 @@ async function handleMessage (senderPsid, receivedMessage) {
         _chiediProssimoDato(senderPsid)
       }
     } else if (receivedMessage.attachments) {
-      
       // Recupera l'url dell'allegato
       let attachmentUrl = receivedMessage.attachments[0].payload.url
       let risposteRapide = []
@@ -243,14 +242,12 @@ async function handleMessage (senderPsid, receivedMessage) {
           quick_replies: risposteRapide
         }
         tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
-
       } else {
         risposta = {
           'text': 'Non ho riconosciuto ' + varConsultazioni[senderPsid].getProssimoArticoloDeterminativo() + ' ' + varConsultazioni[senderPsid].getProssimoNomeDato() + '. Puoi riprovare a fotografarlo oppure digitarlo?'
         }
       }
-      await callSendAPI(senderPsid, risposta)      
-
+      await callSendAPI(senderPsid, risposta)
     } else if (receivedMessage.text) {
       console.log('Ricevuto un messaggio con solo testo')
 
@@ -293,7 +290,6 @@ async function handleMessage (senderPsid, receivedMessage) {
     } else {
       _chiediProssimaPrenotazione(senderPsid)
     }
-
   } else {
     risposta = {
       'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
@@ -319,21 +315,20 @@ async function handlePostback (senderPsid, receivedPostback) {
   // Imposta la risposta basata sul payload del postback
   if (payload === 'inizia') {
     varConsultazioni[senderPsid] = new Consultazione()
-  
+
     var debug = false
     if (debug === true) {
-      await varConsultazioni[senderPsid].setValoreInDato("PCCFNC88C20F262P")
-      await varConsultazioni[senderPsid].setValoreInDato("1234567890123456")
-      await handleMessage(senderPsid, {"text": "160A41234567890"})
-  
+      await varConsultazioni[senderPsid].setValoreInDato('PCCFNC88C20F262P')
+      await varConsultazioni[senderPsid].setValoreInDato('1234567890123456')
+      await handleMessage(senderPsid, {'text': '160A41234567890'})
     } else {
       var sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
-  
+
       risposta = {
         'text': sTesto
       }
       await callSendAPI(senderPsid, risposta)
-  
+
       sTesto = 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' + varConsultazioni[senderPsid].getListaDati()
       risposta = {
         'text': sTesto
@@ -341,7 +336,6 @@ async function handlePostback (senderPsid, receivedPostback) {
       await callSendAPI(senderPsid, risposta)
 
       _chiediProssimoDato(senderPsid)
-
     }
   } else if (payload.includes('sceltaAppuntamento')) {
     sTesto = 'Note ed Avvertenze:\n' + await varConsultazioni[senderPsid].getNoteAvvertenze()
@@ -353,32 +347,29 @@ async function handlePostback (senderPsid, receivedPostback) {
     sTesto = 'Confermi la prenotazione?'
     risposta = {
       'text': sTesto,
-      "quick_replies":[
+      'quick_replies': [
         {
-          "content_type":"text",
-          "title":"Si",
-          "payload":"siPrenota",
+          'content_type': 'text',
+          'title': 'Si',
+          'payload': 'siPrenota'
         },
         {
-          "content_type":"text",
-          "title":"No",
-          "payload":"noPrenota",
+          'content_type': 'text',
+          'title': 'No',
+          'payload': 'noPrenota'
         }
       ]
     }
     await callSendAPI(senderPsid, risposta)
 
     tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
-
-
   } else {
     risposta = {
       'text': 'Mi spiace ma non ho capito'
     }
-  
+
     await callSendAPI(senderPsid, risposta)
   }
-
 }
 
 /**
