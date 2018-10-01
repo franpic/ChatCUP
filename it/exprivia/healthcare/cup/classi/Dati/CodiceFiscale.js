@@ -8,7 +8,7 @@ class CodiceFiscale extends Dato {
       'Codice Fiscale',
       'il',
       'del',
-      'https://github.com/franpic/ChatCUP/blob/master/Immagini/presentazioneDati/TesseraSanitariaCfIndicato.jpg',
+      'https://raw.githubusercontent.com/franpic/ChatCUP/master/Immagini/presentazioneDati/TesseraSanitariaCfIndicato.jpg',
       /\w{16}/g,
       /^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$/,
       'LLLLLLCCLCCLCCCL'
