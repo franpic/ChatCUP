@@ -260,9 +260,7 @@ async function handleMessage (senderPsid, receivedMessage) {
         }
       }
     }
-  }
-  
- else {
+  } else {
     if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
       if (receivedMessage.quick_reply) {
         if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
@@ -320,7 +318,7 @@ async function handlePostback (senderPsid, receivedPostback) {
   if (payload === 'inizia') {
     varConsultazioni[senderPsid] = new Consultazione()
 
-    var debug = false
+    var debug = true
     if (debug === true) {
       await varConsultazioni[senderPsid].setValoreInDato('PCCFNC88C20F262P')
       await varConsultazioni[senderPsid].setValoreInDato('1234567890123456')
