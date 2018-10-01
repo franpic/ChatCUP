@@ -200,7 +200,7 @@ class Consultazione {
     }
   }
 
-  _getProssimoAppuntamentoDaPrenotare() {
+  _getProssimoEsameDaPrenotare() {
     var iEsami = 0
     var trovato = false
     var prossimoEsame = null
@@ -217,17 +217,23 @@ class Consultazione {
     return prossimoEsame
   } 
 
-  isListaEsamiPopolata() {
-    if (this._ultimiEsamiEstrattiDaRicetta === null) {
-      return false
+  getDatiProssimoEsame() {
+    var esame = this._getProssimoEsameDaPrenotare()
+
+    if (esame === null) {
+      return null
     } else {
-      return true
+      return esame
     }
+
   }
 
+  hasProssimoEsameDaPrenotare () {
+    if (this._ultimiEsamiEstrattiDaRicetta === null) {
+      this._ultimiEsamiEstrattiDaRicetta = _getPrescrizioneElettronica()
+    }
 
-  hasProssimoAppuntamentoDaPrenotare () {
-    var esame = this._getProssimoAppuntamentoDaPrenotare()
+    var esame = this._getProssimoEsameDaPrenotare()
 
     if (esame === null) {
       return false
@@ -237,7 +243,7 @@ class Consultazione {
   }
 
   prenotaEsame(isConfermato) {
-    var esame = this._getProssimoAppuntamentoDaPrenotare()
+    var esame = this._getProssimoEsameDaPrenotare()
 
     if (esame === null) {
       return false
@@ -247,7 +253,7 @@ class Consultazione {
     }
   }
 
-  getPrescrizioneElettronica () {
+  _getPrescrizioneElettronica () {
     var t = this
 
     return new Promise(async function(resolve, reject) {
@@ -256,7 +262,6 @@ class Consultazione {
       for (var esame of listaEsami) {
         esame['isPrenotato'] = false
       }
-      this._ultimiEsamiEstrattiDaRicetta = listaEsami
       resolve(listaEsami)
     })
       .catch(errore => {

@@ -25,7 +25,8 @@ const Consultazione = require('./it/exprivia/healthcare/cup/classi/Consultazione
 var varConsultazioni = {}
 const ENUM_TIPO_INPUT_UTENTE = Object.freeze({
   TEXT: 'text',
-  QUICK_REPLY: 'quick_reply'
+  QUICK_REPLY: 'quick_reply',
+  POSTBACK: 'postback'
 })
 var tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
 
@@ -126,6 +127,54 @@ function _chiediProssimoDato (senderPsid) {
   }
 }
 
+function _chiediProssimaPrenotazione(senderPsid) {
+  var risposta = null
+  var datiEsame = varConsultazioni[senderPsid].getDatiProssimoEsame()
+  if (datiEsame !== null) {
+    varConsultazioni[senderPsid].ultimiEsamiEstrattiDaRicetta = await varConsultazioni[senderPsid].getPrescrizioneElettronica()
+    risposta = {
+      'text': 'Ecco gli appuntamenti per l\'esame ' + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
+    }
+    await callSendAPI(senderPsid, risposta)
+    
+    var listaAppuntamenti = await varConsultazioni[senderPsid].getListaDisponibilita()
+    var elementi = []
+    risposta = {}
+
+    for (var appuntamento of listaAppuntamenti) {
+      var giornoDellaSettimana = appuntamento['momento'].getDay()
+      const nomiGiorniSettimana = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
+
+      elementi.push({
+        'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
+        'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
+        'buttons': [{
+          'type': 'postback',
+          'title': 'Prenota',
+          'payload': "sceltaAppuntamento " + appuntamento.toLocaleString()
+        }]
+      })
+    }
+
+    risposta = {
+      'attachment': {
+        'type': 'template',
+        'payload': {
+          'template_type': 'generic',
+          'elements': elementi
+        }
+
+      }
+    }
+    await callSendAPI(senderPsid, risposta)
+
+    tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK 
+    return true
+  } else {
+    return false
+  }  
+}
+
 /**
  * Restituisce il nome dell'utente che sta parlando con il bot, partendo dallo Psid
  * @param {String} senderPsid lo psid dell'utente
@@ -214,84 +263,45 @@ async function handleMessage (senderPsid, receivedMessage) {
         }
       }
     }
-  }
-  
-  if (varConsultazioni[senderPsid].isListaEsamiPopolata() === false) {
-    if (varConsultazioni[senderPsid].hasProssimoAppuntamentoDaPrenotare() === null) {
-      varConsultazioni[senderPsid].ultimiEsamiEstrattiDaRicetta = await varConsultazioni[senderPsid].getPrescrizioneElettronica()
-      for (var esame of varConsultazioni[senderPsid].ultimiEsamiEstrattiDaRicetta) {
-        var sTesto = 'Ecco gli appuntamenti per l\'esame ' + esame['decrProdPrest'] + ' con codici ' + esame['codProdPrest'] + ' (' + esame['codCatalogoPrescr'] + ')'
-        risposta = {
-          'text': sTesto
+  } else if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
+    if (receivedMessage.quick_reply) {
+      if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
+        let payload = receivedMessage.quick_reply.payload
+        if (payload === 'siPrenota') {
+          if (varConsultazioni[senderPsid].setPrenota() === true) {
+            risposta = {
+              'text': 'Hai prenotato'
+            }
+          } else {
+            risposta = {
+              'text': 'Non sono riuscito a prenotare'
+            }
+          }
+        } else if (payload === 'noPrenota') {
+          risposta = {
+            'text': 'Non hai prenotato'
+          }
         }
         await callSendAPI(senderPsid, risposta)
-  
-  
-        var listaAppuntamenti = await varConsultazioni[senderPsid].getListaDisponibilita()
-        var elementi = []
-        risposta = {}
-  
-        for (var appuntamento of listaAppuntamenti) {
-          var giornoDellaSettimana = appuntamento['momento'].getDay()
-          const nomiGiorniSettimana = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
-  
-          elementi.push({
-            'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
-            'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
-            'buttons': [{
-              'type': 'postback',
-              'title': 'Prenota',
-              'payload': "sceltaAppuntamento " + appuntamento.toLocaleString()
-            }]
-          })
-        }
-  
+      } else {
+        console.log('Non mi aspettavo una quick reply')
         risposta = {
-          'attachment': {
-            'type': 'template',
-            'payload': {
-              'template_type': 'generic',
-              'elements': elementi
-            }
-  
-          }
+          'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
         }
         await callSendAPI(senderPsid, risposta)
       }
-    }  
-  } else {
-    if (varConsultazioni[senderPsid].hasProssimoAppuntamentoDaPrenotare()) {
-      if (receivedMessage.quick_reply) {
-        if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-          let payload = receivedMessage.quick_reply.payload
-          if (payload === 'siPrenota') {
-            if (varConsultazioni[senderPsid].setPrenota() === true) {
-              risposta = {
-                'text': 'Hai prenotato, grazie per avermi contattato!'
-              }
-            } else {
-              risposta = {
-                'text': 'Mi spiace ma non sono riuscito a prenotare, grazie per avermi contattato!'
-              }
-            }
-          } else if (payload === 'noPrenota') {
-            risposta = {
-              'text': 'Non hai prenotato, grazie per avermi contattato!'
-            }
-          }
-          await callSendAPI(senderPsid, risposta)    
-          delete varConsultazioni[senderPsid]
-        } else {
-          console.log('Non mi aspettavo una quick reply')
-          risposta = {
-            'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
-          }
-          callSendAPI(senderPsid, risposta)
-        }
-      }    
+    } else {
+      _chiediProssimaPrenotazione(senderPsid)
     }
+
+  } else {
+    risposta = {
+      'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
+    }
+    await callSendAPI(senderPsid, risposta)
+
+    delete varConsultazioni[senderPsid]
   }
-  
 }
 
 /**
@@ -310,7 +320,7 @@ async function handlePostback (senderPsid, receivedPostback) {
   if (payload === 'inizia') {
     varConsultazioni[senderPsid] = new Consultazione()
   
-    var debug = true
+    var debug = false
     if (debug === true) {
       await varConsultazioni[senderPsid].setValoreInDato("PCCFNC88C20F262P")
       await varConsultazioni[senderPsid].setValoreInDato("1234567890123456")
