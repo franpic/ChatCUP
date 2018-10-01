@@ -270,8 +270,11 @@ async function handleMessage (senderPsid, receivedMessage) {
         risposta = {}
   
         for (var appuntamento of listaAppuntamenti) {
+          var giornoDellaSettimana = appuntamento['momento'].getDay()
+          const nomiGiorniSettimana = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
+
           elementi.push({
-            'title': appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
+            'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
             'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
             'buttons': [{
               'type': 'postback',
