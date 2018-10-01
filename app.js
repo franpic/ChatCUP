@@ -310,6 +310,9 @@ async function handlePostback (senderPsid, receivedPostback) {
         'text': sTesto
       }
       await callSendAPI(senderPsid, risposta)
+
+      _chiediProssimoDato(senderPsid)
+
     }
   } else if (payload === 'siPrenota') {
     risposta = {
@@ -363,7 +366,6 @@ async function handlePostback (senderPsid, receivedPostback) {
     await callSendAPI(senderPsid, risposta)
   }
 
-  _chiediProssimoDato(senderPsid)
 }
 
 /**
