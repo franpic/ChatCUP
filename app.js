@@ -260,46 +260,40 @@ async function handleMessage (senderPsid, receivedMessage) {
         }
       }
     }
-  } else {
-    if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
-      if (receivedMessage.quick_reply) {
-        if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-          let payload = receivedMessage.quick_reply.payload
-          if (payload === 'siPrenota') {
-            if (varConsultazioni[senderPsid].setPrenota() === true) {
-              risposta = {
-                'text': 'Hai prenotato'
-              }
-            } else {
-              risposta = {
-                'text': 'Non sono riuscito a prenotare'
-              }
-            }
-          } else if (payload === 'noPrenota') {
-            risposta = {
-              'text': 'Non hai prenotato'
-            }
-          }
-          await callSendAPI(senderPsid, risposta)
-        } else {
-          console.log('Non mi aspettavo una quick reply')
-          risposta = {
-            'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
-          }
-          await callSendAPI(senderPsid, risposta)
-        }
-      } else {
-        _chiediProssimaPrenotazione(senderPsid)
-      }
-    } else {
-      risposta = {
-        'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
-      }
-      await callSendAPI(senderPsid, risposta)
+  }
   
-      delete varConsultazioni[senderPsid]
+  if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
+    if (receivedMessage.quick_reply) {
+      if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
+        let payload = receivedMessage.quick_reply.payload
+        if (payload === 'siPrenota') {
+          if (varConsultazioni[senderPsid].setPrenota() === true) {
+            risposta = {
+              'text': 'Hai prenotato'
+            }
+          } else {
+            risposta = {
+              'text': 'Non sono riuscito a prenotare'
+            }
+          }
+        } else if (payload === 'noPrenota') {
+          risposta = {
+            'text': 'Non hai prenotato'
+          }
+        }
+        await callSendAPI(senderPsid, risposta)
+        _chiediProssimaPrenotazione(senderPsid)
+      } else {
+        console.log('Non mi aspettavo una quick reply')
+        risposta = {
+          'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
+        }
+        await callSendAPI(senderPsid, risposta)
+      }
     }
-  } 
+  } else {
+    delete varConsultazioni[senderPsid]
+  }
 }
 
 /**
