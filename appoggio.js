@@ -10,7 +10,6 @@ async function main () {
   //  const varWebServicesHCup = new WebServicesHCup()
   const listaAppuntamenti = await varConsultazione.popolaListaEsami()
   console.log(JSON.stringify(varConsultazione._ultimiEsamiEstrattiDaRicetta))
-
 }
 
 /* async function main () {

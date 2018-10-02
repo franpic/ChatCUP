@@ -264,16 +264,16 @@ class Consultazione {
 
   popolaListaEsami () {
     var t = this
-    return new Promise(async function(resolve, reject) {
+    return new Promise(async function (resolve, reject) {
       if (t._ultimiEsamiEstrattiDaRicetta === null) {
         t._ultimiEsamiEstrattiDaRicetta = await t._getPrescrizioneElettronica()
-        resolve (true)
+        resolve(true)
       } else {
-        reject (new Error(false))
+        reject(new Error(false))
       }
     })
       .catch(errore => {
-        cosole.error(errore)
+        console.error(errore)
         return false
       })
   }
