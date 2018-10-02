@@ -262,7 +262,7 @@ async function handleMessage (senderPsid, receivedMessage) {
     }
   }
 
-  /*if (varConsultazioni[senderPsid].hasListaEsamiPopolata() === true) {
+  if (varConsultazioni[senderPsid].hasListaEsamiPopolata() === true) {
     if (receivedMessage.quick_reply) {
       if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
         let payload = receivedMessage.quick_reply.payload
@@ -298,7 +298,7 @@ async function handleMessage (senderPsid, receivedMessage) {
     _chiediProssimaPrenotazione(senderPsid)
   } else {
     delete varConsultazioni[senderPsid]
-  }*/
+  }
 }
 
 /**
