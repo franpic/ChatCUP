@@ -297,12 +297,13 @@ class Consultazione {
   }
 
   prenotaEsame (isConfermato) {
+    const varWebServicesHCup = new WebServicesHCup()
     var esame = this._getProssimoEsameDaPrenotare()
 
     if (esame === null) {
       return false
     } else {
-      esame['isPrenotato'] = WebServicesHCup.setPrenota(isConfermato)
+      esame['isPrenotato'] = varWebServicesHCup.setPrenota(isConfermato)
       return esame['isPrenotato']
     }
   }
