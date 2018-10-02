@@ -131,7 +131,6 @@ async function _chiediProssimaPrenotazione (senderPsid) {
   var risposta = null
   var datiEsame = varConsultazioni[senderPsid].getDatiProssimoEsame()
   if (datiEsame !== null) {
-    varConsultazioni[senderPsid].ultimiEsamiEstrattiDaRicetta = await varConsultazioni[senderPsid].getPrescrizioneElettronica()
     risposta = {
       'text': 'Ecco gli appuntamenti per l\'esame ' + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
     }
