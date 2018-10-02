@@ -319,7 +319,7 @@ async function handlePostback (senderPsid, receivedPostback) {
   if (payload === 'inizia') {
     varConsultazioni[senderPsid] = new Consultazione()
 
-    var debug = true
+    var debug = false
     if (debug === true) {
       await varConsultazioni[senderPsid].setValoreInDato('PCCFNC88C20F262P')
       await varConsultazioni[senderPsid].setValoreInDato('1234567890123456')
