@@ -205,13 +205,17 @@ class Consultazione {
     var trovato = false
     var prossimoEsame = null
 
-    while (iEsami < this._ultimiEsamiEstrattiDaRicetta.length && trovato === false) {
-      if (this._ultimiEsamiEstrattiDaRicetta[iEsami].getValore() === '') {
-        prossimoEsame = this._ultimiEsamiEstrattiDaRicetta[iEsami]
-        trovato = true
-      } else {
-        iEsami = iEsami + 1
+    try {
+      while (iEsami < this._ultimiEsamiEstrattiDaRicetta.length && trovato === false) {
+        if (this._ultimiEsamiEstrattiDaRicetta[iEsami].getValore() === '') {
+          prossimoEsame = this._ultimiEsamiEstrattiDaRicetta[iEsami]
+          trovato = true
+        } else {
+          iEsami = iEsami + 1
+        }
       }
+    } catch (errore) {
+      prossimoEsame = null
     }
 
     return prossimoEsame
@@ -258,11 +262,24 @@ class Consultazione {
       })
   }
 
-  hasProssimoEsameDaPrenotare () {
+  popolaListaEsami() {
     if (this._ultimiEsamiEstrattiDaRicetta === null) {
       this._ultimiEsamiEstrattiDaRicetta = this._getPrescrizioneElettronica()
+      return true
+    } else {
+      return false
     }
+  }
 
+  hasListaEsamiPopolata() {
+    if (this._ultimiEsamiEstrattiDaRicetta === null) {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  hasProssimoEsameDaPrenotare () {
     var esame = this._getProssimoEsameDaPrenotare()
 
     if (esame === null) {

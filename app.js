@@ -260,6 +260,11 @@ async function handleMessage (senderPsid, receivedMessage) {
         }
       }
     }
+  }
+
+  if (varConsultazioni[senderPsid].hasListaEsamiPopolata() === false) {
+    varConsultazioni[senderPsid].popolaListaEsami()
+    _chiediProssimaPrenotazione(senderPsid)
   } else if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
     if (receivedMessage.quick_reply) {
       if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
