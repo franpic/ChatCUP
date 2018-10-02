@@ -266,7 +266,7 @@ async function handleMessage (senderPsid, receivedMessage) {
       if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
         let payload = receivedMessage.quick_reply.payload
         if (payload === 'siPrenota') {
-          if (varConsultazioni[senderPsid].setPrenota() === true) {
+          if (varConsultazioni[senderPsid].prenotaEsame(true) === true) {
             risposta = {
               'text': 'Hai prenotato'
             }
