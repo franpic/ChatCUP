@@ -293,8 +293,11 @@ async function handleMessage (senderPsid, receivedMessage) {
     } else {
       _chiediProssimaPrenotazione(senderPsid)
     }
-  } else if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
+  } else {
     await varConsultazioni[senderPsid].popolaListaEsami()
+  }
+
+  if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
     _chiediProssimaPrenotazione(senderPsid)
   } else {
     delete varConsultazioni[senderPsid]
