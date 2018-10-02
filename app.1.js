@@ -176,19 +176,22 @@ async function handleMessage (senderPsid, receivedMessage) {
           'text': 'Hai prenotato, grazie per avermi contattato!'
         }
         await callSendAPI(senderPsid, risposta)
-
+    
         delete varConsultazioni[senderPsid]['consultazione']
+    
       } else if (payload === 'noPrenota') {
         risposta = {
           'text': 'Non hai prenotato, grazie per avermi contattato!'
         }
         await callSendAPI(senderPsid, risposta)
-
+    
         delete varConsultazioni[senderPsid]['consultazione']
+      
       } else {
         varConsultazioni[senderPsid]['consultazione'].setValoreInDato(payload)
         tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
       }
+    
     } else {
       console.log('Non mi aspettavo una quick reply')
       risposta = {
@@ -263,7 +266,7 @@ async function handleMessage (senderPsid, receivedMessage) {
           'buttons': [{
             'type': 'postback',
             'title': 'Prenota',
-            'payload': 'sceltaAppuntamento ' + appuntamento.toLocaleString()
+            'payload': "sceltaAppuntamento " + appuntamento.toLocaleString()
           }]
         })
       }
@@ -279,6 +282,7 @@ async function handleMessage (senderPsid, receivedMessage) {
         }
       }
       await callSendAPI(senderPsid, risposta)
+
     }
   }
 }
@@ -298,21 +302,22 @@ async function handlePostback (senderPsid, receivedPostback) {
   // Imposta la risposta basata sul payload del postback
   if (payload === 'inizia') {
     varConsultazioni[senderPsid] = {consultazione: new Consultazione(), ultimiValoriRiconosciuti: '', ultimoMessaggio: ''}
-
+  
     var debug = false
-
+  
     if (debug === true) {
-      await varConsultazioni[senderPsid]['consultazione'].setValoreInDato('PCCFNC88C20F262P')
-      await varConsultazioni[senderPsid]['consultazione'].setValoreInDato('1234567890123456')
-      await handleMessage(senderPsid, {'text': '160A41234567890'})
+      await varConsultazioni[senderPsid]["consultazione"].setValoreInDato("PCCFNC88C20F262P")
+      await varConsultazioni[senderPsid]["consultazione"].setValoreInDato("1234567890123456")
+      await handleMessage(senderPsid, {"text": "160A41234567890"})
+  
     } else {
       var sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
-
+  
       risposta = {
         'text': sTesto
       }
       await callSendAPI(senderPsid, risposta)
-
+  
       sTesto = 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' + varConsultazioni[senderPsid]['consultazione'].getListaDati()
       risposta = {
         'text': sTesto
@@ -320,6 +325,7 @@ async function handlePostback (senderPsid, receivedPostback) {
       await callSendAPI(senderPsid, risposta)
 
       _chiediProssimoDato(senderPsid)
+
     }
   } else if (payload.includes('sceltaAppuntamento')) {
     sTesto = 'Note ed Avvertenze:\n' + await varConsultazioni[senderPsid]['consultazione'].getNoteAvvertenze()
@@ -331,29 +337,32 @@ async function handlePostback (senderPsid, receivedPostback) {
     sTesto = 'Confermi la prenotazione?'
     risposta = {
       'text': sTesto,
-      'quick_replies': [
+      "quick_replies":[
         {
-          'content_type': 'text',
-          'title': 'Si',
-          'payload': 'siPrenota'
+          "content_type":"text",
+          "title":"Si",
+          "payload":"siPrenota",
         },
         {
-          'content_type': 'text',
-          'title': 'No',
-          'payload': 'noPrenota'
+          "content_type":"text",
+          "title":"No",
+          "payload":"noPrenota",
         }
       ]
     }
     await callSendAPI(senderPsid, risposta)
 
     tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
+
+
   } else {
     risposta = {
       'text': 'Mi spiace ma non ho capito'
     }
-
+  
     await callSendAPI(senderPsid, risposta)
   }
+
 }
 
 /**
