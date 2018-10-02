@@ -19,6 +19,9 @@ class Consultazione {
       new NumeroTesseraSanitaria(),
       new NumeroRicettaElettronica()
     ]
+
+    this._ultimiValoriRiconosciutiDaOcr = null
+    this._ultimiEsamiEstrattiDaRicetta = null
   }
 
   /**
@@ -147,7 +150,8 @@ class Consultazione {
     if (dato === null) {
       return null
     } else {
-      return dato.getPossibiliValoriDaImmagine(percorso)
+      this._ultimiValoriRiconosciutiDaOcr = dato.getPossibiliValoriDaImmagine(percorso)
+      return this._ultimiValoriRiconosciutiDaOcr
     }
   }
 
@@ -196,12 +200,46 @@ class Consultazione {
     }
   }
 
-  getPrescrizioneElettronica () {
+  _getProssimoEsameDaPrenotare () {
+    var iEsami = 0
+    var trovato = false
+    var prossimoEsame = null
+
+    try {
+      while (iEsami < this._ultimiEsamiEstrattiDaRicetta.length && trovato === false) {
+        if (this._ultimiEsamiEstrattiDaRicetta[iEsami].getValore() === '') {
+          prossimoEsame = this._ultimiEsamiEstrattiDaRicetta[iEsami]
+          trovato = true
+        } else {
+          iEsami = iEsami + 1
+        }
+      }
+    } catch (errore) {
+      prossimoEsame = null
+    }
+
+    return prossimoEsame
+  }
+
+  getDatiProssimoEsame () {
+    var esame = this._getProssimoEsameDaPrenotare()
+
+    if (esame === null) {
+      return null
+    } else {
+      return esame
+    }
+  }
+
+  _getPrescrizioneElettronica () {
     var t = this
 
-    return new Promise(async function(resolve, reject) {
+    return new Promise(async function (resolve, reject) {
       const varWebServicesHCup = new WebServicesHCup()
       const listaEsami = await varWebServicesHCup.getPrescrizioneElettronica(t._arrDati[0], t._arrDati[2])
+      for (var esame of listaEsami) {
+        esame['isPrenotato'] = false
+      }
       resolve(listaEsami)
     })
       .catch(errore => {
@@ -213,7 +251,7 @@ class Consultazione {
   getListaDisponibilita () {
     var t = this
 
-    return new Promise(async function(resolve, reject) {
+    return new Promise(async function (resolve, reject) {
       const varWebServicesHCup = new WebServicesHCup()
       const listaAppuntamenti = await varWebServicesHCup.getListaDisponibilita(t._arrDati[0], t._arrDati[2])
       resolve(listaAppuntamenti)
@@ -224,10 +262,53 @@ class Consultazione {
       })
   }
 
-  getNoteAvvertenze () {
+  popolaListaEsami () {
     var t = this
-
     return new Promise(async function(resolve, reject) {
+      if (t._ultimiEsamiEstrattiDaRicetta === null) {
+        t._ultimiEsamiEstrattiDaRicetta = await t._getPrescrizioneElettronica()
+        resolve (true)
+      } else {
+        reject (new Error(false))
+      }
+    })
+      .catch(errore => {
+        cosole.error(errore)
+        return false
+      })
+  }
+
+  hasListaEsamiPopolata () {
+    if (this._ultimiEsamiEstrattiDaRicetta === null) {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  hasProssimoEsameDaPrenotare () {
+    var esame = this._getProssimoEsameDaPrenotare()
+
+    if (esame === null) {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  prenotaEsame (isConfermato) {
+    var esame = this._getProssimoEsameDaPrenotare()
+
+    if (esame === null) {
+      return false
+    } else {
+      esame['isPrenotato'] = WebServicesHCup.setPrenota(isConfermato)
+      return esame['isPrenotato']
+    }
+  }
+
+  getNoteAvvertenze () {
+    return new Promise(async function (resolve, reject) {
       const varWebServicesHCup = new WebServicesHCup()
       const noteAvvertenze = await varWebServicesHCup.getNoteAvvertenze()
       resolve(noteAvvertenze['noteAvvertenze'])
@@ -237,8 +318,6 @@ class Consultazione {
         return errore
       })
   }
-
-  
 }
 
 module.exports = Consultazione

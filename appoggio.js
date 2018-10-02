@@ -7,32 +7,10 @@ const Consultazione = require('./it/exprivia/healthcare/cup/classi/Consultazione
 
 async function main () {
   const varConsultazione = new Consultazione()
-//  const varWebServicesHCup = new WebServicesHCup()
-  const listaAppuntamenti = await varConsultazione.getListaDisponibilita()
-  console.log(listaAppuntamenti)
+  //  const varWebServicesHCup = new WebServicesHCup()
+  const listaAppuntamenti = await varConsultazione.popolaListaEsami()
+  console.log(JSON.stringify(varConsultazione._ultimiEsamiEstrattiDaRicetta))
 
-  var elementi = []
-  var risposta = {}
-  for (var appuntamento of listaAppuntamenti) {
-    elementi.push({
-      'title': appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
-      'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
-      'buttons': [{
-        'type': 'postback',
-        'title': 'Prenota',
-        'payload': appuntamento
-      }]
-    })
-
-    risposta = {
-      'payload': {
-        'template_type': 'generic',
-        'elements': elementi
-      }
-    }
-  }
-
-  console.log(risposta)
 }
 
 /* async function main () {
