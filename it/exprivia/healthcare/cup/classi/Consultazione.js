@@ -207,7 +207,7 @@ class Consultazione {
 
     try {
       while (iEsami < this._ultimiEsamiEstrattiDaRicetta.length && trovato === false) {
-        if (this._ultimiEsamiEstrattiDaRicetta[iEsami].getValore() === '') {
+        if (this._ultimiEsamiEstrattiDaRicetta[iEsami]['isPrenotato'] === false) {
           prossimoEsame = this._ultimiEsamiEstrattiDaRicetta[iEsami]
           trovato = true
         } else {
