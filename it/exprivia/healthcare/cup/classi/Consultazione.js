@@ -262,16 +262,23 @@ class Consultazione {
       })
   }
 
-  popolaListaEsami() {
-    if (this._ultimiEsamiEstrattiDaRicetta === null) {
-      this._ultimiEsamiEstrattiDaRicetta = this._getPrescrizioneElettronica()
-      return true
-    } else {
-      return false
-    }
+  popolaListaEsami () {
+    var t = this
+    return new Promise(async function(resolve, reject) {
+      if (t._ultimiEsamiEstrattiDaRicetta === null) {
+        t._ultimiEsamiEstrattiDaRicetta = await t._getPrescrizioneElettronica()
+        resolve (true)
+      } else {
+        reject (new Error(false))
+      }
+    })
+      .catch(errore => {
+        cosole.error(errore)
+        return false
+      })
   }
 
-  hasListaEsamiPopolata() {
+  hasListaEsamiPopolata () {
     if (this._ultimiEsamiEstrattiDaRicetta === null) {
       return false
     } else {

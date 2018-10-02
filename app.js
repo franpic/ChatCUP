@@ -262,10 +262,7 @@ async function handleMessage (senderPsid, receivedMessage) {
     }
   }
 
-  if (varConsultazioni[senderPsid].hasListaEsamiPopolata() === false) {
-    varConsultazioni[senderPsid].popolaListaEsami()
-    _chiediProssimaPrenotazione(senderPsid)
-  } else if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
+  if (varConsultazioni[senderPsid].hasListaEsamiPopolata() === true) {
     if (receivedMessage.quick_reply) {
       if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
         let payload = receivedMessage.quick_reply.payload
@@ -296,6 +293,9 @@ async function handleMessage (senderPsid, receivedMessage) {
     } else {
       _chiediProssimaPrenotazione(senderPsid)
     }
+  } else if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
+    await varConsultazioni[senderPsid].popolaListaEsami()
+    _chiediProssimaPrenotazione(senderPsid)
   } else {
     delete varConsultazioni[senderPsid]
   }
