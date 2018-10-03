@@ -262,7 +262,7 @@ class Consultazione {
       })
   }
 
-  popolaListaEsami () {
+  _popolaListaEsami () {
     var t = this
     return new Promise(async function (resolve, reject) {
       if (t._ultimiEsamiEstrattiDaRicetta === null) {
@@ -278,16 +278,12 @@ class Consultazione {
       })
   }
 
-  hasListaEsamiPopolata () {
-    if (this._ultimiEsamiEstrattiDaRicetta === null) {
-      return false
-    } else {
-      return true
+  async hasProssimoEsameDaPrenotare () {
+    if (_ultimiEsamiEstrattiDaRicetta === null) {
+      await this._popolaListaEsami()
     }
-  }
 
-  hasProssimoEsameDaPrenotare () {
-    var esame = this._getProssimoEsameDaPrenotare()
+    var esame = await this._getProssimoEsameDaPrenotare()
 
     if (esame === null) {
       return false
@@ -295,6 +291,19 @@ class Consultazione {
       return true
     }
   }
+
+  
+  getNoteAvvertenze () {
+    return new Promise(async function (resolve, reject) {
+      const varWebServicesHCup = new WebServicesHCup()
+      const noteAvvertenze = await varWebServicesHCup.getNoteAvvertenze()
+      resolve(noteAvvertenze['noteAvvertenze'])
+    })
+    .catch(errore => {
+      console.error(errore)
+        return errore
+      })
+    }
 
   prenotaEsame (isConfermato) {
     const varWebServicesHCup = new WebServicesHCup()
@@ -306,18 +315,6 @@ class Consultazione {
       esame['isPrenotato'] = varWebServicesHCup.setPrenota(isConfermato)
       return esame['isPrenotato']
     }
-  }
-
-  getNoteAvvertenze () {
-    return new Promise(async function (resolve, reject) {
-      const varWebServicesHCup = new WebServicesHCup()
-      const noteAvvertenze = await varWebServicesHCup.getNoteAvvertenze()
-      resolve(noteAvvertenze['noteAvvertenze'])
-    })
-      .catch(errore => {
-        console.error(errore)
-        return errore
-      })
   }
 }
 

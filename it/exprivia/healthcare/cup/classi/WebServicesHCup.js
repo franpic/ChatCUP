@@ -123,7 +123,7 @@ class WebServicesHCup {
           'codCatalogoPrescr': Math.floor(Math.random() * 100000)
         }
       ]
-//      var numEsamiDaRestituire = Math.floor(Math.random() * dbEsami.length) + 1
+      //      var numEsamiDaRestituire = Math.floor(Math.random() * dbEsami.length) + 1
       var numEsamiDaRestituire = 1
       var esamiDaRestituire = []
 
@@ -195,17 +195,16 @@ class WebServicesHCup {
 
   /**
    * @todo ATTENZIONE! QUESTO E' UNO STUB DA MODIFICARE IL PRIMA POSSIBILE!
-   * 
+   *
    */
   getNoteAvvertenze () {
     var t = this
 
     return new Promise(function (resolve, reject) {
-      
       resolve({
-        "noteAvvertenze": "- Non è necessario essere a digiuno ma è preferibile fare una colazione leggera\n" + 
-                "- Per la prova è meglio indossare indumenti comodi\n" + 
-                "- Si deve avvisare il personale di eventuali disturbi accusati nelle ultime 48 ore.\n" + 
+        'noteAvvertenze': '- Non è necessario essere a digiuno ma è preferibile fare una colazione leggera\n' +
+                '- Per la prova è meglio indossare indumenti comodi\n' +
+                '- Si deve avvisare il personale di eventuali disturbi accusati nelle ultime 48 ore.\n' +
                 "- Presentarsi all'appuntamento con tutta la documentazione relativa a visite ed esami precedenti (ECG, visite cardiologiche, esami ematochimici ed altro)"
       })
     })
@@ -215,10 +214,9 @@ class WebServicesHCup {
       })
   }
 
-  setPrenota(isConfermato) {
+  setPrenota (isConfermato) {
     return isConfermato
   }
 }
-
 
 module.exports = WebServicesHCup

@@ -259,7 +259,11 @@ async function handleMessage (senderPsid, receivedMessage) {
         }
       }
     }
-  } else if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
+  } else {
+
+  }
+
+  if (varConsultazioni[senderPsid].hasListaEsamiPopolata() === true) {
     if (receivedMessage.quick_reply) {
       if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
         let payload = receivedMessage.quick_reply.payload
@@ -279,21 +283,25 @@ async function handleMessage (senderPsid, receivedMessage) {
           }
         }
         await callSendAPI(senderPsid, risposta)
-
-        if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === false) {
-          delete varConsultazioni[senderPsid]
-        }
-
         _chiediProssimaPrenotazione(senderPsid)
       } else {
+        console.log('Non mi aspettavo una quick reply')
         risposta = {
           'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
         }
         await callSendAPI(senderPsid, risposta)
       }
+    } else {
+      _chiediProssimaPrenotazione(senderPsid)
     }
   } else {
+    await varConsultazioni[senderPsid].popolaListaEsami()
+  }
+
+  if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
     _chiediProssimaPrenotazione(senderPsid)
+  } else {
+    delete varConsultazioni[senderPsid]
   }
 }
 
