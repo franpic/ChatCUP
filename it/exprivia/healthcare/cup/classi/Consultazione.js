@@ -279,7 +279,7 @@ class Consultazione {
   }
 
   async hasProssimoEsameDaPrenotare () {
-    if (_ultimiEsamiEstrattiDaRicetta === null) {
+    if (this._ultimiEsamiEstrattiDaRicetta === null) {
       await this._popolaListaEsami()
     }
 
@@ -292,18 +292,17 @@ class Consultazione {
     }
   }
 
-  
   getNoteAvvertenze () {
     return new Promise(async function (resolve, reject) {
       const varWebServicesHCup = new WebServicesHCup()
       const noteAvvertenze = await varWebServicesHCup.getNoteAvvertenze()
       resolve(noteAvvertenze['noteAvvertenze'])
     })
-    .catch(errore => {
-      console.error(errore)
+      .catch(errore => {
+        console.error(errore)
         return errore
       })
-    }
+  }
 
   prenotaEsame (isConfermato) {
     const varWebServicesHCup = new WebServicesHCup()

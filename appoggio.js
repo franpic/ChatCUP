@@ -1,6 +1,6 @@
 'use strict'
 
-const WebServicesHCup = require('./it/exprivia/healthcare/cup/classi/WebServicesHCup.js')
+// const WebServicesHCup = require('./it/exprivia/healthcare/cup/classi/WebServicesHCup.js')
 // const CodiceFiscale = require('./it/exprivia/healthcare/cup/classi/Dati/CodiceFiscale.js')
 // const NumeroRicettaElettronica = require('./it/exprivia/healthcare/cup/classi/Dati/NumeroRicettaElettronica')
 const Consultazione = require('./it/exprivia/healthcare/cup/classi/Consultazione.js')
@@ -8,7 +8,7 @@ const Consultazione = require('./it/exprivia/healthcare/cup/classi/Consultazione
 async function main () {
   const varConsultazione = new Consultazione()
   //  const varWebServicesHCup = new WebServicesHCup()
-  const listaAppuntamenti = await varConsultazione.popolaListaEsami()
+  // const listaAppuntamenti = await varConsultazione.popolaListaEsami()
   console.log(JSON.stringify(varConsultazione._ultimiEsamiEstrattiDaRicetta))
 }
 

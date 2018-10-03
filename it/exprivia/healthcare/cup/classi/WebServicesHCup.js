@@ -198,8 +198,6 @@ class WebServicesHCup {
    *
    */
   getNoteAvvertenze () {
-    var t = this
-
     return new Promise(function (resolve, reject) {
       resolve({
         'noteAvvertenze': '- Non è necessario essere a digiuno ma è preferibile fare una colazione leggera\n' +
