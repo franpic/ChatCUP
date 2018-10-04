@@ -249,6 +249,14 @@ class Consultazione {
       })
   }
 
+  hasListaEsamiPopolata() {
+    if (this._ultimiEsamiEstrattiDaRicetta === null) {
+      return false
+    } else {
+      return true
+    }
+  }
+
   popolaListaEsami () {
     var t = this
     return new Promise(async function (resolve, reject) {
