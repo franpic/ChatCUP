@@ -19,7 +19,6 @@ class CodiceFiscale extends Dato {
     console.log('entrato in _checkValore in CodiceFiscale con valore ' + valore)
     var regexp = new RegExp(this.patternRegexStretta)
 
-    valore = valore.toUpperCase()
     if (regexp.test(valore) === false) {
       return false
     } else {

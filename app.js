@@ -204,13 +204,16 @@ function _getNomeDaPsid (senderPsid) {
  * Gestisce gli eventi dei messaggi
  * @param {*} senderPsid L'id Facebook di chi sta chattando con il bot
  * @param {*} receivedMessage Il messaggio ricevuto dall'utente
+ * 
+ * @todo Volendo si può velocizzare l'esecuzione di questa funzione creando una o più variabili d'istanza,
+ * nella classe Consultazione, in modo che venga segnata la fase da gestire 
  */
 async function handleMessage (senderPsid, receivedMessage) {
   console.log('messaggioRicevuto: ' + JSON.stringify(receivedMessage))
 
   var risposta
   const S_MESSAGGIO_TIPO_INPUT = 'Mi spiace ma non ho capito.'
-
+  
   if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
     if (receivedMessage.quick_reply) {
       if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
@@ -259,7 +262,9 @@ async function handleMessage (senderPsid, receivedMessage) {
         }
       }
     }
-  } else if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
+  }
+
+  if ((varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === false) && (varConsultazioni[senderPsid].hasListaEsamiPopolata() === true)) {
     if (receivedMessage.quick_reply) {
       if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
         let payload = receivedMessage.quick_reply.payload
@@ -279,21 +284,25 @@ async function handleMessage (senderPsid, receivedMessage) {
           }
         }
         await callSendAPI(senderPsid, risposta)
-
-        if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === false) {
-          delete varConsultazioni[senderPsid]
-        }
-
         _chiediProssimaPrenotazione(senderPsid)
       } else {
+        console.log('Non mi aspettavo una quick reply')
         risposta = {
           'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
         }
         await callSendAPI(senderPsid, risposta)
       }
+    } else {
+      _chiediProssimaPrenotazione(senderPsid)
     }
   } else {
+    await varConsultazioni[senderPsid].popolaListaEsami()
+  }
+
+  if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
     _chiediProssimaPrenotazione(senderPsid)
+  } else {
+    delete varConsultazioni[senderPsid]
   }
 }
 

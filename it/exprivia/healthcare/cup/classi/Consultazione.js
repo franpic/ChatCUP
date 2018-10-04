@@ -200,12 +200,15 @@ class Consultazione {
     }
   }
 
+  
   _getProssimoEsameDaPrenotare () {
     var iEsami = 0
     var trovato = false
     var prossimoEsame = null
 
-    try {
+    if (this._ultimiEsamiEstrattiDaRicetta === null) {
+      prossimoEsame = null
+    } else {
       while (iEsami < this._ultimiEsamiEstrattiDaRicetta.length && trovato === false) {
         if (this._ultimiEsamiEstrattiDaRicetta[iEsami]['isPrenotato'] === false) {
           prossimoEsame = this._ultimiEsamiEstrattiDaRicetta[iEsami]
@@ -214,8 +217,6 @@ class Consultazione {
           iEsami = iEsami + 1
         }
       }
-    } catch (errore) {
-      prossimoEsame = null
     }
 
     return prossimoEsame
@@ -248,21 +249,7 @@ class Consultazione {
       })
   }
 
-  getListaDisponibilita () {
-    var t = this
-
-    return new Promise(async function (resolve, reject) {
-      const varWebServicesHCup = new WebServicesHCup()
-      const listaAppuntamenti = await varWebServicesHCup.getListaDisponibilita(t._arrDati[0], t._arrDati[2])
-      resolve(listaAppuntamenti)
-    })
-      .catch(errore => {
-        console.error(errore)
-        return errore
-      })
-  }
-
-  _popolaListaEsami () {
+  popolaListaEsami () {
     var t = this
     return new Promise(async function (resolve, reject) {
       if (t._ultimiEsamiEstrattiDaRicetta === null) {
@@ -279,10 +266,6 @@ class Consultazione {
   }
 
   async hasProssimoEsameDaPrenotare () {
-    if (this._ultimiEsamiEstrattiDaRicetta === null) {
-      await this._popolaListaEsami()
-    }
-
     var esame = await this._getProssimoEsameDaPrenotare()
 
     if (esame === null) {
@@ -290,6 +273,20 @@ class Consultazione {
     } else {
       return true
     }
+  }
+
+  getListaDisponibilita () {
+    var t = this
+
+    return new Promise(async function (resolve, reject) {
+      const varWebServicesHCup = new WebServicesHCup()
+      const listaAppuntamenti = await varWebServicesHCup.getListaDisponibilita(t._arrDati[0], t._arrDati[2])
+      resolve(listaAppuntamenti)
+    })
+      .catch(errore => {
+        console.error(errore)
+        return errore
+      })
   }
 
   getNoteAvvertenze () {
