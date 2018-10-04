@@ -201,7 +201,6 @@ class Consultazione {
     }
   }
 
-  
   _getProssimoEsameDaPrenotare () {
     var iEsami = 0
     var trovato = false

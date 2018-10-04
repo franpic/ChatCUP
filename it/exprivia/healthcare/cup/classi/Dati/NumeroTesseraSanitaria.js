@@ -16,7 +16,7 @@ class NumeroTesseraSanitaria extends Dato {
   }
 
   _checkValore (valore) {
-    const regexp = RegExp(this.patternRegexStretta)
+    const regexp = RegExp(this.regexStretta)
 
     valore = valore.toUpperCase()
     return (regexp.test(valore))

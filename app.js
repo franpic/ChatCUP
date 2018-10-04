@@ -204,16 +204,16 @@ function _getNomeDaPsid (senderPsid) {
  * Gestisce gli eventi dei messaggi
  * @param {*} senderPsid L'id Facebook di chi sta chattando con il bot
  * @param {*} receivedMessage Il messaggio ricevuto dall'utente
- * 
+ *
  * @todo Volendo si può velocizzare l'esecuzione di questa funzione creando una o più variabili d'istanza,
- * nella classe Consultazione, in modo che venga segnata la fase da gestire 
+ * nella classe Consultazione, in modo che venga segnata la fase da gestire
  */
 async function handleMessage (senderPsid, receivedMessage) {
   console.log('messaggioRicevuto: ' + JSON.stringify(receivedMessage))
 
   var risposta
   const S_MESSAGGIO_TIPO_INPUT = 'Mi spiace ma non ho capito.'
-  
+
   if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
     if (receivedMessage.quick_reply) {
       if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
