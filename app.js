@@ -300,6 +300,7 @@ async function handleMessage (senderPsid, receivedMessage) {
       }
     } else {
       await varConsultazioni[senderPsid].popolaListaEsami()
+      _chiediProssimaPrenotazione(senderPsid)
     }
   }
 
