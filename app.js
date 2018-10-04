@@ -305,6 +305,10 @@ async function handleMessage (senderPsid, receivedMessage) {
   }
 
   if ((varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === false) && (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === false)) {
+    risposta = {
+      'text': 'Hai prenotato tutti gli esami nella ricetta'
+    }
+    await callSendAPI(senderPsid, risposta)
     delete varConsultazioni[senderPsid]
   }
 }
