@@ -264,7 +264,9 @@ async function handleMessage (senderPsid, receivedMessage) {
     }
   }
 
-  if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === false) {
+  if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
+    _chiediProssimoDato(senderPsid)
+  } else {
     if (varConsultazioni[senderPsid].hasListaEsamiPopolata() === true) {
       if (receivedMessage.quick_reply) {
         if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
@@ -299,7 +301,6 @@ async function handleMessage (senderPsid, receivedMessage) {
     } else {
       await varConsultazioni[senderPsid].popolaListaEsami()
     }
-
   }
 
   if ((varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === false) && (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === false)) {
