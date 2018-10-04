@@ -130,7 +130,6 @@ class Consultazione {
   setValoreInDato (valore) {
     console.log('Entrato in setValoreInDato in Consultazione.js con valore ' + valore)
 
-    valore = valore.toUpperCase()
     var dato = this._getProssimoDato()
 
     if (dato === null) {

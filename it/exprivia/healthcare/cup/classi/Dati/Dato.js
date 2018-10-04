@@ -164,6 +164,7 @@ class Dato {
    * @returns {boolean} true se assegnazione riuscita, false altrimenti
    */
   setValore (valore) {
+    valore = valore.toUpperCase()
     if (this._checkValore(valore) === true) {
       this.valore = valore
       console.log('Il valore ' + valore + ' è stato accettato.')

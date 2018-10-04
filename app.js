@@ -264,44 +264,45 @@ async function handleMessage (senderPsid, receivedMessage) {
     }
   }
 
-  if ((varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === false) && (varConsultazioni[senderPsid].hasListaEsamiPopolata() === true)) {
-    if (receivedMessage.quick_reply) {
-      if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-        let payload = receivedMessage.quick_reply.payload
-        if (payload === 'siPrenota') {
-          if (varConsultazioni[senderPsid].prenotaEsame(true) === true) {
-            risposta = {
-              'text': 'Hai prenotato'
+  if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === false) {
+    if (varConsultazioni[senderPsid].hasListaEsamiPopolata() === true) {
+      if (receivedMessage.quick_reply) {
+        if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
+          let payload = receivedMessage.quick_reply.payload
+          if (payload === 'siPrenota') {
+            if (varConsultazioni[senderPsid].prenotaEsame(true) === true) {
+              risposta = {
+                'text': 'Hai prenotato'
+              }
+            } else {
+              risposta = {
+                'text': 'Non sono riuscito a prenotare'
+              }
             }
-          } else {
+          } else if (payload === 'noPrenota') {
             risposta = {
-              'text': 'Non sono riuscito a prenotare'
+              'text': 'Non hai prenotato'
             }
           }
-        } else if (payload === 'noPrenota') {
+          await callSendAPI(senderPsid, risposta)
+          _chiediProssimaPrenotazione(senderPsid)
+        } else {
+          console.log('Non mi aspettavo una quick reply')
           risposta = {
-            'text': 'Non hai prenotato'
+            'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
           }
+          await callSendAPI(senderPsid, risposta)
         }
-        await callSendAPI(senderPsid, risposta)
-        _chiediProssimaPrenotazione(senderPsid)
       } else {
-        console.log('Non mi aspettavo una quick reply')
-        risposta = {
-          'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
-        }
-        await callSendAPI(senderPsid, risposta)
+        _chiediProssimaPrenotazione(senderPsid)
       }
     } else {
-      _chiediProssimaPrenotazione(senderPsid)
+      await varConsultazioni[senderPsid].popolaListaEsami()
     }
-  } else {
-    await varConsultazioni[senderPsid].popolaListaEsami()
+
   }
 
-  if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
-    _chiediProssimaPrenotazione(senderPsid)
-  } else {
+  if ((varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === false) && (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === false)) {
     delete varConsultazioni[senderPsid]
   }
 }
