@@ -240,7 +240,7 @@ class Consultazione {
     var prossimoEsame = null
 
     if (this._ultimiEsamiEstrattiDaRicetta === null) {
-      _popolaListaEsami()
+      this._popolaListaEsami()
     }
     
     if (this._ultimiEsamiEstrattiDaRicetta !== null) {
