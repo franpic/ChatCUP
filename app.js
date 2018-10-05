@@ -219,6 +219,7 @@ async function handleMessage (senderPsid, receivedMessage) {
       if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
         var payload = receivedMessage.quick_reply.payload
         varConsultazioni[senderPsid].setValoreInDato(payload)
+        tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
       } 
     } else if (receivedMessage.attachments) {
       // Recupera l'url dell'allegato
