@@ -242,7 +242,7 @@ class Consultazione {
     if (this._ultimiEsamiEstrattiDaRicetta === null) {
       this._popolaListaEsami()
     }
-    
+
     if (this._ultimiEsamiEstrattiDaRicetta !== null) {
       prossimoEsame = null
     } else {
@@ -259,7 +259,7 @@ class Consultazione {
     return prossimoEsame
   }
 
-  hasListaEsamiPopolata() {
+  hasListaEsamiPopolata () {
     if (this._ultimiEsamiEstrattiDaRicetta === null) {
       return false
     } else {

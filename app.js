@@ -220,7 +220,7 @@ async function handleMessage (senderPsid, receivedMessage) {
         var payload = receivedMessage.quick_reply.payload
         varConsultazioni[senderPsid].setValoreInDato(payload)
         tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
-      } 
+      }
     } else if (receivedMessage.attachments) {
       // Recupera l'url dell'allegato
       let attachmentUrl = receivedMessage.attachments[0].payload.url
@@ -274,11 +274,10 @@ async function handleMessage (senderPsid, receivedMessage) {
           risposta = {
             'text': 'Non ho trovato esami per cui prenotare appuntamenti'
           }
-          await callSendAPI(senderPsid, risposta)    
+          await callSendAPI(senderPsid, risposta)
         }
       }
     }
-
   } else if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
     if (receivedMessage.quick_reply) {
       if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
@@ -310,8 +309,6 @@ async function handleMessage (senderPsid, receivedMessage) {
     } else {
       _chiediProssimaPrenotazione(senderPsid)
     }
-
-  
   } else {
     await varConsultazioni[senderPsid].popolaListaEsami()
     _chiediProssimaPrenotazione(senderPsid)
@@ -342,7 +339,7 @@ async function handlePostback (senderPsid, receivedPostback) {
   if (payload === 'inizia') {
     varConsultazioni[senderPsid] = new Consultazione()
 
-    var debug = true
+    var debug = false
     if (debug === true) {
       await varConsultazioni[senderPsid].setValoreInDato('PCCFNC88C20F262P')
       await varConsultazioni[senderPsid].setValoreInDato('12345678901234567890')

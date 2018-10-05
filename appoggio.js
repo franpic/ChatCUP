@@ -9,13 +9,13 @@ async function main () {
   const varConsultazione = new Consultazione()
   //  const varWebServicesHCup = new WebServicesHCup()
   // const listaAppuntamenti = await varConsultazione.popolaListaEsami()
-  console.log(JSON.stringify(varConsultazione._ultimiEsamiEstrattiDaRicetta))
+  console.log(JSON.stringify(await varConsultazione._getProssimoEsameDaPrenotare()))
 }
 
-async function main () {
+/* async function main () {
   var d = new CodiceFiscale()
   var t = await d._checkValore('pccfnc88c20f262p')
   console.log(t)
-}
+} */
 
 main()
