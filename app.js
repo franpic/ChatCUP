@@ -262,18 +262,20 @@ async function handleMessage (senderPsid, receivedMessage) {
       }
     }
 
-    if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
-      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
-      _chiediProssimoDato(senderPsid)
-    } else {
-      await varConsultazioni[senderPsid].popolaListaEsami()
-      if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
-        _chiediProssimaPrenotazione(senderPsid)
+    if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
+      if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
+        _chiediProssimoDato(senderPsid)
       } else {
-        risposta = {
-          'text': 'Non ho trovato esami per cui prenotare appuntamenti'
+        await varConsultazioni[senderPsid].popolaListaEsami()
+        if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
+          _chiediProssimaPrenotazione(senderPsid)
+          tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
+        } else {
+          risposta = {
+            'text': 'Non ho trovato esami per cui prenotare appuntamenti'
+          }
+          await callSendAPI(senderPsid, risposta)    
         }
-        await callSendAPI(senderPsid, risposta)    
       }
     }
 
