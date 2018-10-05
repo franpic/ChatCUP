@@ -201,37 +201,6 @@ class Consultazione {
     }
   }
 
-  _getProssimoEsameDaPrenotare () {
-    var iEsami = 0
-    var trovato = false
-    var prossimoEsame = null
-
-    if (this._ultimiEsamiEstrattiDaRicetta === null) {
-      prossimoEsame = null
-    } else {
-      while (iEsami < this._ultimiEsamiEstrattiDaRicetta.length && trovato === false) {
-        if (this._ultimiEsamiEstrattiDaRicetta[iEsami]['isPrenotato'] === false) {
-          prossimoEsame = this._ultimiEsamiEstrattiDaRicetta[iEsami]
-          trovato = true
-        } else {
-          iEsami = iEsami + 1
-        }
-      }
-    }
-
-    return prossimoEsame
-  }
-
-  getDatiProssimoEsame () {
-    var esame = this._getProssimoEsameDaPrenotare()
-
-    if (esame === null) {
-      return null
-    } else {
-      return esame
-    }
-  }
-
   _getPrescrizioneElettronica () {
     var t = this
 
@@ -249,15 +218,7 @@ class Consultazione {
       })
   }
 
-  hasListaEsamiPopolata() {
-    if (this._ultimiEsamiEstrattiDaRicetta === null) {
-      return false
-    } else {
-      return true
-    }
-  }
-
-  popolaListaEsami () {
+  _popolaListaEsami () {
     var t = this
     return new Promise(async function (resolve, reject) {
       if (t._ultimiEsamiEstrattiDaRicetta === null) {
@@ -271,6 +232,49 @@ class Consultazione {
         console.error(errore)
         return false
       })
+  }
+
+  _getProssimoEsameDaPrenotare () {
+    var iEsami = 0
+    var trovato = false
+    var prossimoEsame = null
+
+    if (this._ultimiEsamiEstrattiDaRicetta === null) {
+      _popolaListaEsami()
+    }
+    
+    if (this._ultimiEsamiEstrattiDaRicetta !== null) {
+      prossimoEsame = null
+    } else {
+      while (iEsami < this._ultimiEsamiEstrattiDaRicetta.length && trovato === false) {
+        if (this._ultimiEsamiEstrattiDaRicetta[iEsami]['isPrenotato'] === false) {
+          prossimoEsame = this._ultimiEsamiEstrattiDaRicetta[iEsami]
+          trovato = true
+        } else {
+          iEsami = iEsami + 1
+        }
+      }
+    }
+
+    return prossimoEsame
+  }
+
+  hasListaEsamiPopolata() {
+    if (this._ultimiEsamiEstrattiDaRicetta === null) {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  getDatiProssimoEsame () {
+    var esame = this._getProssimoEsameDaPrenotare()
+
+    if (esame === null) {
+      return null
+    } else {
+      return esame
+    }
   }
 
   async hasProssimoEsameDaPrenotare () {
