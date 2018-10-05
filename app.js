@@ -267,7 +267,6 @@ async function handleMessage (senderPsid, receivedMessage) {
       if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
         _chiediProssimoDato(senderPsid)
       } else {
-        await varConsultazioni[senderPsid].popolaListaEsami()
         if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
           _chiediProssimaPrenotazione(senderPsid)
           tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
