@@ -101,36 +101,38 @@ app.post('/webhook', (req, res) => {
  * @returns {Boolean} true se viene chiesto un prossimo dato, false altrimenti
  */
 function _chiediProssimoDato (senderPsid) {
-  var risposta
-
-  // Se c'è, chiede il prossimo dato mancante
-  if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
-    risposta = {
-      'attachment': {
-        'type': 'template',
-        'payload': {
-          'template_type': 'generic',
-          'elements': [
-            {
-              'title': varConsultazioni[senderPsid].getFraseRichiestaProssimoDato(),
-              'image_url': varConsultazioni[senderPsid].getUrlImmagineProssimoDato()
-            }
-          ]
+  return new Promise((resolve, reject) => {
+    var risposta
+  
+    // Se c'è, chiede il prossimo dato mancante
+    if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
+      risposta = {
+        'attachment': {
+          'type': 'template',
+          'payload': {
+            'template_type': 'generic',
+            'elements': [
+              {
+                'title': varConsultazioni[senderPsid].getFraseRichiestaProssimoDato(),
+                'image_url': varConsultazioni[senderPsid].getUrlImmagineProssimoDato()
+              }
+            ]
+          }
         }
       }
+      callSendAPI(senderPsid, risposta)
+      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
+      resolve(true)
+    } else {
+      reject(new Error(false))
     }
-    callSendAPI(senderPsid, risposta)
-    tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
-    return true
-  } else {
-    return false
-  }
+  })
 }
 
 function _chiediProssimaPrenotazione (senderPsid) {
   new Promise (async function(resolve, reject) {
     var risposta = null
-    var datiEsame = varConsultazioni[senderPsid].getDatiProssimoEsame()
+    var datiEsame = await varConsultazioni[senderPsid].getDatiProssimoEsame()
     if (datiEsame !== null) {
       risposta = {
         'text': 'Ecco gli appuntamenti per l\'esame ' + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
@@ -278,13 +280,13 @@ async function handleMessage (senderPsid, receivedMessage) {
       }
       break
 
-    case (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
+    case (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
       switch(true) {
         case(receivedMessage.quick_reply !== undefined):
           if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
             let payload = receivedMessage.quick_reply.payload
             if (payload === 'siPrenota') {
-              if (varConsultazioni[senderPsid].prenotaEsame(true) === true) {
+              if (await varConsultazioni[senderPsid].prenotaEsame(true) === true) {
                 risposta = {
                   'text': 'Hai prenotato'
                 }
@@ -328,23 +330,26 @@ async function handleMessage (senderPsid, receivedMessage) {
 
   }
 
-  if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-    switch(true) {
-      case (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
+  switch(true) {
+    case (await varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
+      if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
         _chiediProssimoDato(senderPsid)
-        break
+      }
+      break
 
-      case (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
+    case (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
+      if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
         await _chiediProssimaPrenotazione(senderPsid)
-        break
-      
-      default:
-        risposta = {
-          'text': 'Hai prenotato tutti gli esami nella ricetta'
-        }
-        await callSendAPI(senderPsid, risposta)
-        delete varConsultazioni[senderPsid]
-    }
+      }
+      break
+
+    default:
+      risposta = {
+        'text': 'Hai prenotato tutti gli esami nella ricetta'
+      }
+      await callSendAPI(senderPsid, risposta)
+      delete varConsultazioni[senderPsid]
+      break
   }
 
 }

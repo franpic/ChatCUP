@@ -112,13 +112,15 @@ class Consultazione {
    * @returns {Boolean} true se esiste un dato non valorizzato, false altrimenti
    */
   hasProssimoDatoDaChiedere () {
-    var dato = this._getProssimoDato()
-
-    if (dato === null) {
-      return false
-    } else {
-      return true
-    }
+    return new Promise((resolve, reject) => {
+      var dato = this._getProssimoDato()
+  
+      if (dato === null) {
+        reject(new Error(false))
+      } else {
+        resolve(true)
+      }
+    })
   }
 
   /**
