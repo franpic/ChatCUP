@@ -157,7 +157,7 @@ function _chiediProssimaPrenotazione (senderPsid) {
           'buttons': [{
             'type': 'postback',
             'title': 'Prenota',
-            'payload': 'sceltaAppuntamento ' + appuntamento.toLocaleString()
+            'payload': appuntamento
           }]
         })
       }
@@ -289,10 +289,11 @@ async function handleMessage (senderPsid, receivedMessage) {
         case (receivedMessage.quick_reply !== undefined):
           if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
             let payload = receivedMessage.quick_reply.payload
-            if (payload === 'siPrenota') {
+            if (payload['momento']) {
               if (await varConsultazioni[senderPsid].prenotaEsame(true) === true) {
                 risposta = {
-                  'text': 'L\'esame è stato prenotato'
+                  'text': 'L\'esame è stato prenotato.\n' + 
+                          'Il numero coupon della prenotazione è ' + Math.floor(Math.random() * 10000) + 'del ' + (new Date()).getFullYear()
                 }
               } else {
                 risposta = {
@@ -390,7 +391,7 @@ async function handlePostback (senderPsid, receivedPostback) {
 
       _chiediProssimoDato(senderPsid)
     }
-  } else if (payload.includes('sceltaAppuntamento')) {
+  } else if (payload['presidio'] !== undefined) {
     sTesto = 'Note ed Avvertenze:\n' + await varConsultazioni[senderPsid].getNoteAvvertenze()
     risposta = {
       'text': sTesto
@@ -404,7 +405,7 @@ async function handlePostback (senderPsid, receivedPostback) {
         {
           'content_type': 'text',
           'title': 'Si',
-          'payload': 'siPrenota'
+          'payload': payload
         },
         {
           'content_type': 'text',
