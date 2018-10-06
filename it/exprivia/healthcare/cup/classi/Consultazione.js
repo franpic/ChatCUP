@@ -234,16 +234,16 @@ class Consultazione {
       })
   }
 
-  _getProssimoEsameDaPrenotare () {
+  async _getProssimoEsameDaPrenotare () {
     var iEsami = 0
     var trovato = false
     var prossimoEsame = null
 
     if (this._ultimiEsamiEstrattiDaRicetta === null) {
-      this._popolaListaEsami()
+      await this._popolaListaEsami()
     }
 
-    if (this._ultimiEsamiEstrattiDaRicetta !== null) {
+    if (this._ultimiEsamiEstrattiDaRicetta === null) {
       prossimoEsame = null
     } else {
       while (iEsami < this._ultimiEsamiEstrattiDaRicetta.length && trovato === false) {
