@@ -337,7 +337,7 @@ async function handleMessage (senderPsid, receivedMessage) {
   switch(true) {
     case (await varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
       if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-        _chiediProssimoDato(senderPsid)
+        await _chiediProssimoDato(senderPsid)
       }
       break
 
