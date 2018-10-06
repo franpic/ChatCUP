@@ -342,7 +342,7 @@ async function handleMessage (senderPsid, receivedMessage) {
     case (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
       await _chiediProssimaPrenotazione(senderPsid)
       break
-
+      
     default:
       risposta = {
         'text': 'Hai prenotato tutti gli esami nella ricetta'

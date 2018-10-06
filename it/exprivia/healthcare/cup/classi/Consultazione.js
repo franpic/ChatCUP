@@ -240,29 +240,35 @@ class Consultazione {
       })
   }
 
-  async _getProssimoEsameDaPrenotare () {
-    var iEsami = 0
-    var trovato = false
-    var prossimoEsame = null
-
-    if (this._ultimiEsamiEstrattiDaRicetta === null) {
-      await this._popolaListaEsami()
-    }
-
-    if (this._ultimiEsamiEstrattiDaRicetta === null) {
-      prossimoEsame = null
-    } else {
-      while (iEsami < this._ultimiEsamiEstrattiDaRicetta.length && trovato === false) {
-        if (this._ultimiEsamiEstrattiDaRicetta[iEsami]['isPrenotato'] === false) {
-          prossimoEsame = this._ultimiEsamiEstrattiDaRicetta[iEsami]
-          trovato = true
-        } else {
-          iEsami = iEsami + 1
+  _getProssimoEsameDaPrenotare () {
+    return new Promise(async function(resolve, reject) {
+      var iEsami = 0
+      var trovato = false
+      var prossimoEsame = null
+  
+      if (this._ultimiEsamiEstrattiDaRicetta === null) {
+        await this._popolaListaEsami()
+      }
+  
+      if (this._ultimiEsamiEstrattiDaRicetta === null) {
+        prossimoEsame = null
+      } else {
+        while (iEsami < this._ultimiEsamiEstrattiDaRicetta.length && trovato === false) {
+          if (this._ultimiEsamiEstrattiDaRicetta[iEsami]['isPrenotato'] === false) {
+            prossimoEsame = this._ultimiEsamiEstrattiDaRicetta[iEsami]
+            trovato = true
+          } else {
+            iEsami = iEsami + 1
+          }
         }
       }
-    }
-
-    return prossimoEsame
+  
+      resolve(prossimoEsame)
+    })
+      .catch(errore => {
+        console.error(errore)
+        return null
+      })
   }
 
   hasListaEsamiPopolata () {
