@@ -289,11 +289,11 @@ async function handleMessage (senderPsid, receivedMessage) {
         case (receivedMessage.quick_reply !== undefined):
           if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
             let payload = receivedMessage.quick_reply.payload
-            switch(payload) {
+            switch (payload) {
               case ('siPrenota'):
                 if (await varConsultazioni[senderPsid].prenotaEsame(true) === true) {
                   risposta = {
-                    'text': 'L\'esame è stato prenotato.\n' + 
+                    'text': 'L\'esame è stato prenotato.\n' +
                             'Il numero coupon della prenotazione è ' + Math.floor(Math.random() * 10000) + ' del ' + (new Date()).getFullYear()
                   }
                   await callSendAPI(senderPsid, risposta)
@@ -314,9 +314,8 @@ async function handleMessage (senderPsid, receivedMessage) {
                     ]
                   }
                   await callSendAPI(senderPsid, risposta)
-              
-                  tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY            
-                  
+
+                  tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
                 } else {
                   risposta = {
                     'text': 'Non sono riuscito a prenotare l\'esame'
@@ -337,7 +336,7 @@ async function handleMessage (senderPsid, receivedMessage) {
                   'text': 'A quale indirizzo email preferisci ricevere il riepilogo?'
                 }
                 await callSendAPI(senderPsid, risposta)
-                tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY            
+                tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
                 break
 
               case ('noEmail'):
@@ -346,9 +345,7 @@ async function handleMessage (senderPsid, receivedMessage) {
 
               default:
                 break
-              
-              }
-            
+            }
           } else {
             console.log('Mi aspettavo una quick reply')
             risposta = {
@@ -371,7 +368,7 @@ async function handleMessage (senderPsid, receivedMessage) {
           break
       }
       break
-    
+
     case (varConsultazioni[senderPsid].ENUM_FASI.EMAIL):
       switch (true) {
         case (receivedMessage.quick_reply !== undefined):
@@ -408,7 +405,7 @@ async function handleMessage (senderPsid, receivedMessage) {
       if (await varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
         if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
           await _chiediProssimoDato(senderPsid)
-        }  
+        }
       } else {
         varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.PRENOTAZIONE_ESAME
       }
@@ -416,7 +413,7 @@ async function handleMessage (senderPsid, receivedMessage) {
 
     case (varConsultazioni[senderPsid].ENUM_FASI.PRENOTAZIONE_ESAME):
       if (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
-        await _chiediProssimaPrenotazione(senderPsid)  
+        await _chiediProssimaPrenotazione(senderPsid)
       } else {
         varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.EMAIL
       }
@@ -447,6 +444,7 @@ async function handlePostback (senderPsid, receivedPostback) {
   // Imposta la risposta basata sul payload del postback
   if (payload === 'inizia') {
     varConsultazioni[senderPsid] = new Consultazione()
+    varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.DATI
 
     var debug = false
     if (debug === true) {

@@ -28,7 +28,7 @@ class Consultazione {
       EMAIL: 'postback',
       NOTE: 'note'
     })
-    this.fase = ENUM_FASI.DATI
+    this.fase = null
   }
 
   /**
@@ -249,15 +249,15 @@ class Consultazione {
 
   _getProssimoEsameDaPrenotare () {
     var t = this
-    return new Promise(async function(resolve, reject) {
+    return new Promise(async function (resolve, reject) {
       var iEsami = 0
       var trovato = false
       var prossimoEsame = null
-  
+
       if (t._ultimiEsamiEstrattiDaRicetta === null) {
         await t._popolaListaEsami()
       }
-  
+
       if (t._ultimiEsamiEstrattiDaRicetta === null) {
         prossimoEsame = null
       } else {
@@ -270,7 +270,7 @@ class Consultazione {
           }
         }
       }
-  
+
       resolve(prossimoEsame)
     })
       .catch(errore => {
