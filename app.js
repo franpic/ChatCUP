@@ -335,7 +335,7 @@ async function handleMessage (senderPsid, receivedMessage) {
         _chiediProssimoDato(senderPsid)
         break
 
-      case (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
+      case (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
         await _chiediProssimaPrenotazione(senderPsid)
         break
       
