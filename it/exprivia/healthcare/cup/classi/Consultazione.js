@@ -241,21 +241,22 @@ class Consultazione {
   }
 
   _getProssimoEsameDaPrenotare () {
+    var t = this
     return new Promise(async function(resolve, reject) {
       var iEsami = 0
       var trovato = false
       var prossimoEsame = null
   
-      if (this._ultimiEsamiEstrattiDaRicetta === null) {
-        await this._popolaListaEsami()
+      if (t._ultimiEsamiEstrattiDaRicetta === null) {
+        await t._popolaListaEsami()
       }
   
-      if (this._ultimiEsamiEstrattiDaRicetta === null) {
+      if (t._ultimiEsamiEstrattiDaRicetta === null) {
         prossimoEsame = null
       } else {
-        while (iEsami < this._ultimiEsamiEstrattiDaRicetta.length && trovato === false) {
-          if (this._ultimiEsamiEstrattiDaRicetta[iEsami]['isPrenotato'] === false) {
-            prossimoEsame = this._ultimiEsamiEstrattiDaRicetta[iEsami]
+        while (iEsami < t._ultimiEsamiEstrattiDaRicetta.length && trovato === false) {
+          if (t._ultimiEsamiEstrattiDaRicetta[iEsami]['isPrenotato'] === false) {
+            prossimoEsame = t._ultimiEsamiEstrattiDaRicetta[iEsami]
             trovato = true
           } else {
             iEsami = iEsami + 1
