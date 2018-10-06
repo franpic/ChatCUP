@@ -128,15 +128,14 @@ function _chiediProssimoDato (senderPsid) {
 }
 
 function _chiediProssimaPrenotazione (senderPsid) {
-  var t = this
   new Promise (async function(resolve, reject) {
     var risposta = null
-    var datiEsame = t.varConsultazioni[senderPsid].getDatiProssimoEsame()
+    var datiEsame = varConsultazioni[senderPsid].getDatiProssimoEsame()
     if (datiEsame !== null) {
       risposta = {
         'text': 'Ecco gli appuntamenti per l\'esame ' + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
       }
-      await t.callSendAPI(senderPsid, risposta)
+      await callSendAPI(senderPsid, risposta)
   
       var listaAppuntamenti = await varConsultazioni[senderPsid].getListaDisponibilita()
       var elementi = []
@@ -167,9 +166,9 @@ function _chiediProssimaPrenotazione (senderPsid) {
   
         }
       }
-      await t.callSendAPI(senderPsid, risposta)
+      await callSendAPI(senderPsid, risposta)
   
-      t.tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
+      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
       resolve (true)
     } else {
       reject(new Error(false))
