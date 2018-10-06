@@ -226,8 +226,8 @@ async function handleMessage (senderPsid, receivedMessage) {
   var risposta
   const S_MESSAGGIO_TIPO_INPUT = 'Mi spiace ma non ho capito.'
 
-  switch (true) {
-    case (await varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
+  switch (varConsultazioni[senderPsid].fase) {
+    case (varConsultazioni[senderPsid].ENUM_FASI.DATI):
       switch (true) {
         case (receivedMessage.quick_reply !== undefined):
           if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
@@ -284,28 +284,71 @@ async function handleMessage (senderPsid, receivedMessage) {
       }
       break
 
-    case (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
+    case (varConsultazioni[senderPsid].ENUM_FASI.PRENOTAZIONE_ESAME):
       switch (true) {
         case (receivedMessage.quick_reply !== undefined):
           if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
             let payload = receivedMessage.quick_reply.payload
-            if ('siPrenota') {
-              if (await varConsultazioni[senderPsid].prenotaEsame(true) === true) {
-                risposta = {
-                  'text': 'L\'esame è stato prenotato.\n' + 
-                          'Il numero coupon della prenotazione è ' + Math.floor(Math.random() * 10000) + 'del ' + (new Date()).getFullYear()
+            switch(payload) {
+              case ('siPrenota'):
+                if (await varConsultazioni[senderPsid].prenotaEsame(true) === true) {
+                  risposta = {
+                    'text': 'L\'esame è stato prenotato.\n' + 
+                            'Il numero coupon della prenotazione è ' + Math.floor(Math.random() * 10000) + ' del ' + (new Date()).getFullYear()
+                  }
+                  await callSendAPI(senderPsid, risposta)
+
+                  risposta = {
+                    'text': 'Confermi la prenotazione?',
+                    'quick_replies': [
+                      {
+                        'content_type': 'text',
+                        'title': 'Si',
+                        'payload': 'siPrenota'
+                      },
+                      {
+                        'content_type': 'text',
+                        'title': 'No',
+                        'payload': 'noPrenota'
+                      }
+                    ]
+                  }
+                  await callSendAPI(senderPsid, risposta)
+              
+                  tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY            
+                  
+                } else {
+                  risposta = {
+                    'text': 'Non sono riuscito a prenotare l\'esame'
+                  }
+                  await callSendAPI(senderPsid, risposta)
                 }
-              } else {
+                break
+
+              case ('noPrenota'):
                 risposta = {
-                  'text': 'Non sono riuscito a prenotare l\'esame'
+                  'text': 'Non hai prenotato'
                 }
+                await callSendAPI(senderPsid, risposta)
+                break
+
+              case ('siEmail'):
+                risposta = {
+                  'text': 'A quale indirizzo email preferisci ricevere il riepilogo?'
+                }
+                await callSendAPI(senderPsid, risposta)
+                tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY            
+                break
+
+              case ('noEmail'):
+                varConsultazioni[senderPsid].fasi = varConsultazioni[senderPsid].ENUM_FASI.NOTE
+                break
+
+              default:
+                break
+              
               }
-            } else if (payload === 'noPrenota') {
-              risposta = {
-                'text': 'Non hai prenotato'
-              }
-            }
-            await callSendAPI(senderPsid, risposta)
+            
           } else {
             console.log('Mi aspettavo una quick reply')
             risposta = {
@@ -328,20 +371,55 @@ async function handleMessage (senderPsid, receivedMessage) {
           break
       }
       break
+    
+    case (varConsultazioni[senderPsid].ENUM_FASI.EMAIL):
+      switch (true) {
+        case (receivedMessage.quick_reply !== undefined):
+          break
+
+        case (receivedMessage.attachments !== undefined):
+          break
+
+        case (receivedMessage.text !== undefined):
+          var re = new RegExp(/[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*/)
+          var indirizzoEmail = ''
+          if (re.test(receivedMessage.text)) {
+            indirizzoEmail = re.exec(receivedMessage.text)
+          }
+
+          risposta = {
+            'text': 'Ti ho inviato una mail all\'indirizzo ' + indirizzoEmail
+          }
+          await callSendAPI(senderPsid, risposta)
+          varConsultazioni[senderPsid].fasi = varConsultazioni[senderPsid].ENUM_FASI.NOTE
+          break
+
+        default:
+          break
+      }
+      break
 
     default:
       break
   }
 
-  switch (true) {
-    case (await varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
-      if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-        await _chiediProssimoDato(senderPsid)
+  switch (varConsultazioni[senderPsid].fase) {
+    case (varConsultazioni[senderPsid].ENUM_FASI.DATI):
+      if (await varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
+        if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
+          await _chiediProssimoDato(senderPsid)
+        }  
+      } else {
+        varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.PRENOTAZIONE_ESAME
       }
       break
 
-    case (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
-      await _chiediProssimaPrenotazione(senderPsid)
+    case (varConsultazioni[senderPsid].ENUM_FASI.PRENOTAZIONE_ESAME):
+      if (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
+        await _chiediProssimaPrenotazione(senderPsid)  
+      } else {
+        varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.EMAIL
+      }
       break
 
     default:
@@ -376,41 +454,36 @@ async function handlePostback (senderPsid, receivedPostback) {
       await varConsultazioni[senderPsid].setValoreInDato('12345678901234567890')
       await handleMessage(senderPsid, {'text': '160A41234567890'})
     } else {
-      var sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
-
       risposta = {
-        'text': sTesto
+        'text': 'Ciao ' + await _getNomeDaPsid(senderPsid)
       }
       await callSendAPI(senderPsid, risposta)
 
-      sTesto = 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' + varConsultazioni[senderPsid].getListaDati()
       risposta = {
-        'text': sTesto
+        'text': 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' + varConsultazioni[senderPsid].getListaDati()
       }
       await callSendAPI(senderPsid, risposta)
 
       _chiediProssimoDato(senderPsid)
     }
   } else if (payload.includes('prenotaAppuntamento')) {
-    sTesto = 'Note ed Avvertenze:\n' + await varConsultazioni[senderPsid].getNoteAvvertenze()
     risposta = {
-      'text': sTesto
+      'text': 'Note ed Avvertenze:\n' + await varConsultazioni[senderPsid].getNoteAvvertenze()
     }
     await callSendAPI(senderPsid, risposta)
 
-    sTesto = 'Confermi la prenotazione?'
     risposta = {
-      'text': sTesto,
+      'text': 'Desideri ricevere il riepilogo della prenotazione per email?',
       'quick_replies': [
         {
           'content_type': 'text',
           'title': 'Si',
-          'payload': 'siPrenota'
+          'payload': 'siEmail'
         },
         {
           'content_type': 'text',
           'title': 'No',
-          'payload': 'noPrenota'
+          'payload': 'noEmail'
         }
       ]
     }

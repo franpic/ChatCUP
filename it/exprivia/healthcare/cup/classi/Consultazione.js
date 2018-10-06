@@ -22,6 +22,13 @@ class Consultazione {
 
     this._ultimiValoriRiconosciutiDaOcr = null
     this._ultimiEsamiEstrattiDaRicetta = null
+    this.ENUM_FASI = Object.freeze({
+      DATI: 'dati',
+      PRENOTAZIONE_ESAME: 'prenotazioneEsame',
+      EMAIL: 'postback',
+      NOTE: 'note'
+    })
+    this.fase = ENUM_FASI.DATI
   }
 
   /**
