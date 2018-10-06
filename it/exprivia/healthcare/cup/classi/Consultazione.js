@@ -326,7 +326,7 @@ class Consultazione {
       })
   }
 
-  prenotaEsame (isConfermato) {
+  async prenotaEsame (isConfermato) {
     const varWebServicesHCup = new WebServicesHCup()
     var esame = await this._getProssimoEsameDaPrenotare()
 
