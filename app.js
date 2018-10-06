@@ -227,7 +227,7 @@ async function handleMessage (senderPsid, receivedMessage) {
   const S_MESSAGGIO_TIPO_INPUT = 'Mi spiace ma non ho capito.'
 
   switch (true) {
-    case (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
+    case (await varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
       switch (true) {
         case (receivedMessage.quick_reply !== undefined):
           if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
