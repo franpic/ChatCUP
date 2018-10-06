@@ -127,6 +127,10 @@ function _chiediProssimoDato (senderPsid) {
       reject(new Error(false))
     }
   })
+    .catch(errore => {
+      console.error(errore)
+      return false
+    })
 }
 
 function _chiediProssimaPrenotazione (senderPsid) {

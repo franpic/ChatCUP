@@ -121,6 +121,10 @@ class Consultazione {
         resolve(true)
       }
     })
+      .catch(errore => {
+        console.error(errore)
+        return false
+      })
   }
 
   /**
