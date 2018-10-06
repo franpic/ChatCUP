@@ -116,7 +116,7 @@ class Consultazione {
       var dato = this._getProssimoDato()
 
       if (dato === null) {
-        reject(new Error(false))
+        resolve(false)
       } else {
         resolve(true)
       }
