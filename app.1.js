@@ -220,18 +220,18 @@ async function handleMessage (senderPsid, receivedMessage) {
         var payload = receivedMessage.quick_reply.payload
         varConsultazioni[senderPsid].setValoreInDato(payload)
         tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
-        _chiediProssimoDato(senderPsid)
       }
     } else if (receivedMessage.attachments) {
       // Recupera l'url dell'allegato
       let attachmentUrl = receivedMessage.attachments[0].payload.url
       let risposteRapide = []
+      let valoriRiconosciutiInImmagine = null
 
-      // Uso il servizio azure per riconoscere il testo nelle foto
-      varConsultazioni[senderPsid].ultimiValoriRiconosciutiDaOcr = await varConsultazioni[senderPsid].getPossibiliValoriDaImmagine(attachmentUrl)
-      console.log('valoriRiconosciutiInImmagine: ' + varConsultazioni[senderPsid].ultimiValoriRiconosciutiDaOcr)
-      if (varConsultazioni[senderPsid].ultimiValoriRiconosciutiDaOcr !== null) {
-        for (var valorePotenziale of varConsultazioni[senderPsid].ultimiValoriRiconosciutiDaOcr) {
+      // Uso i servizi OCR per riconoscere il testo nelle foto
+      valoriRiconosciutiInImmagine = await varConsultazioni[senderPsid].getPossibiliValoriDaImmagine(attachmentUrl)
+      console.log('valoriRiconosciutiInImmagine: ' + valoriRiconosciutiInImmagine)
+      if (valoriRiconosciutiInImmagine !== null) {
+        for (var valorePotenziale of valoriRiconosciutiInImmagine) {
           risposteRapide.push({
             content_type: 'text',
             title: valorePotenziale,
@@ -262,46 +262,56 @@ async function handleMessage (senderPsid, receivedMessage) {
         }
       }
     }
-  }
 
-  if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
-    _chiediProssimoDato(senderPsid)
-  } else {
-    if (varConsultazioni[senderPsid].hasListaEsamiPopolata() === true) {
-      if (receivedMessage.quick_reply) {
-        if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-          let payload = receivedMessage.quick_reply.payload
-          if (payload === 'siPrenota') {
-            if (varConsultazioni[senderPsid].prenotaEsame(true) === true) {
-              risposta = {
-                'text': 'Hai prenotato'
-              }
-            } else {
-              risposta = {
-                'text': 'Non sono riuscito a prenotare'
-              }
-            }
-          } else if (payload === 'noPrenota') {
-            risposta = {
-              'text': 'Non hai prenotato'
-            }
-          }
-          await callSendAPI(senderPsid, risposta)
+    if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
+      if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
+        _chiediProssimoDato(senderPsid)
+      } else {
+        if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
           _chiediProssimaPrenotazione(senderPsid)
+          tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
         } else {
-          console.log('Non mi aspettavo una quick reply')
           risposta = {
-            'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
+            'text': 'Non ho trovato esami per cui prenotare appuntamenti'
           }
           await callSendAPI(senderPsid, risposta)
         }
-      } else {
+      }
+    }
+  } else if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
+    if (receivedMessage.quick_reply) {
+      if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
+        let payload = receivedMessage.quick_reply.payload
+        if (payload === 'siPrenota') {
+          if (varConsultazioni[senderPsid].prenotaEsame(true) === true) {
+            risposta = {
+              'text': 'Hai prenotato'
+            }
+          } else {
+            risposta = {
+              'text': 'Non sono riuscito a prenotare'
+            }
+          }
+        } else if (payload === 'noPrenota') {
+          risposta = {
+            'text': 'Non hai prenotato'
+          }
+        }
+        await callSendAPI(senderPsid, risposta)
         _chiediProssimaPrenotazione(senderPsid)
+      } else {
+        console.log('Non mi aspettavo una quick reply')
+        risposta = {
+          'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
+        }
+        await callSendAPI(senderPsid, risposta)
       }
     } else {
-      await varConsultazioni[senderPsid].popolaListaEsami()
       _chiediProssimaPrenotazione(senderPsid)
     }
+  } else {
+    await varConsultazioni[senderPsid].popolaListaEsami()
+    _chiediProssimaPrenotazione(senderPsid)
   }
 
   if ((varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === false) && (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === false)) {
@@ -332,7 +342,7 @@ async function handlePostback (senderPsid, receivedPostback) {
     var debug = false
     if (debug === true) {
       await varConsultazioni[senderPsid].setValoreInDato('PCCFNC88C20F262P')
-      await varConsultazioni[senderPsid].setValoreInDato('1234567890123456')
+      await varConsultazioni[senderPsid].setValoreInDato('12345678901234567890')
       await handleMessage(senderPsid, {'text': '160A41234567890'})
     } else {
       var sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)

@@ -214,113 +214,134 @@ async function handleMessage (senderPsid, receivedMessage) {
   var risposta
   const S_MESSAGGIO_TIPO_INPUT = 'Mi spiace ma non ho capito.'
 
-  if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
-    if (receivedMessage.quick_reply) {
-      if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-        var payload = receivedMessage.quick_reply.payload
-        varConsultazioni[senderPsid].setValoreInDato(payload)
-        tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
-      }
-    } else if (receivedMessage.attachments) {
-      // Recupera l'url dell'allegato
-      let attachmentUrl = receivedMessage.attachments[0].payload.url
-      let risposteRapide = []
-      let valoriRiconosciutiInImmagine = null
-
-      // Uso i servizi OCR per riconoscere il testo nelle foto
-      valoriRiconosciutiInImmagine = await varConsultazioni[senderPsid].getPossibiliValoriDaImmagine(attachmentUrl)
-      console.log('valoriRiconosciutiInImmagine: ' + valoriRiconosciutiInImmagine)
-      if (valoriRiconosciutiInImmagine !== null) {
-        for (var valorePotenziale of valoriRiconosciutiInImmagine) {
-          risposteRapide.push({
-            content_type: 'text',
-            title: valorePotenziale,
-            payload: valorePotenziale
-          })
-        }
-
-        risposta = {
-          text: 'Nell\'immagine ho riconosciuto i seguenti possibili valori ' + varConsultazioni[senderPsid].getProssimaProposizioneArticolata() + ' ' + varConsultazioni[senderPsid].getProssimoNomeDato() + '. Se vedi quello giusto toccalo altrimenti puoi inviarmene un\'altra foto oppure scrivermelo.',
-          quick_replies: risposteRapide
-        }
-        tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
-      } else {
-        risposta = {
-          'text': 'Non ho riconosciuto ' + varConsultazioni[senderPsid].getProssimoArticoloDeterminativo() + ' ' + varConsultazioni[senderPsid].getProssimoNomeDato() + '. Puoi riprovare a fotografarlo oppure digitarlo?'
-        }
-      }
-      await callSendAPI(senderPsid, risposta)
-    } else if (receivedMessage.text) {
-      console.log('Ricevuto un messaggio con solo testo')
-
-      if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.TEXT) {
-        if (varConsultazioni[senderPsid].setValoreInDato(receivedMessage.text) === false) {
-          risposta = {
-            'text': varConsultazioni[senderPsid].getFraseFormatoDatoErrato()
+  switch(true) {
+    case (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
+      switch(true) {
+        case(receivedMessage.quick_reply):
+          if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
+            var payload = receivedMessage.quick_reply.payload
+            varConsultazioni[senderPsid].setValoreInDato(payload)
+            tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
           }
-          await callSendAPI(senderPsid, risposta)
-        }
-      }
-    }
+          break
 
-    if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-      if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
-        _chiediProssimoDato(senderPsid)
-      } else {
-        if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
-          _chiediProssimaPrenotazione(senderPsid)
-          tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
-        } else {
-          risposta = {
-            'text': 'Non ho trovato esami per cui prenotare appuntamenti'
-          }
-          await callSendAPI(senderPsid, risposta)
-        }
-      }
-    }
-  } else if (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true) {
-    if (receivedMessage.quick_reply) {
-      if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-        let payload = receivedMessage.quick_reply.payload
-        if (payload === 'siPrenota') {
-          if (varConsultazioni[senderPsid].prenotaEsame(true) === true) {
-            risposta = {
-              'text': 'Hai prenotato'
+        case(receivedMessage.attachments):
+          // Recupera l'url dell'allegato
+          let attachmentUrl = receivedMessage.attachments[0].payload.url
+          let risposteRapide = []
+          let valoriRiconosciutiInImmagine = null
+
+          // Uso i servizi OCR per riconoscere il testo nelle foto
+          valoriRiconosciutiInImmagine = await varConsultazioni[senderPsid].getPossibiliValoriDaImmagine(attachmentUrl)
+          console.log('valoriRiconosciutiInImmagine: ' + valoriRiconosciutiInImmagine)
+          if (valoriRiconosciutiInImmagine !== null) {
+            for (var valorePotenziale of valoriRiconosciutiInImmagine) {
+              risposteRapide.push({
+                content_type: 'text',
+                title: valorePotenziale,
+                payload: valorePotenziale
+              })
             }
+
+            risposta = {
+              text: 'Nell\'immagine ho riconosciuto i seguenti possibili valori ' + varConsultazioni[senderPsid].getProssimaProposizioneArticolata() + ' ' + varConsultazioni[senderPsid].getProssimoNomeDato() + '. Se vedi quello giusto toccalo altrimenti puoi inviarmene un\'altra foto oppure scrivermelo.',
+              quick_replies: risposteRapide
+            }
+            tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
           } else {
             risposta = {
-              'text': 'Non sono riuscito a prenotare'
+              'text': 'Non ho riconosciuto ' + varConsultazioni[senderPsid].getProssimoArticoloDeterminativo() + ' ' + varConsultazioni[senderPsid].getProssimoNomeDato() + '. Puoi riprovare a fotografarlo oppure digitarlo?'
             }
           }
-        } else if (payload === 'noPrenota') {
-          risposta = {
-            'text': 'Non hai prenotato'
-          }
-        }
-        await callSendAPI(senderPsid, risposta)
-        _chiediProssimaPrenotazione(senderPsid)
-      } else {
-        console.log('Non mi aspettavo una quick reply')
-        risposta = {
-          'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
-        }
-        await callSendAPI(senderPsid, risposta)
+          await callSendAPI(senderPsid, risposta)
+          break
+
+        case(receivedMessage.text):
+          if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.TEXT) {
+            if (varConsultazioni[senderPsid].setValoreInDato(receivedMessage.text) === false) {
+              risposta = {
+                'text': varConsultazioni[senderPsid].getFraseFormatoDatoErrato()
+              }
+              await callSendAPI(senderPsid, risposta)
+            }
+          }  
+          break
+
+        default:
+          break
       }
-    } else {
-      _chiediProssimaPrenotazione(senderPsid)
-    }
-  } else {
-    await varConsultazioni[senderPsid].popolaListaEsami()
-    _chiediProssimaPrenotazione(senderPsid)
+      break
+
+    case (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
+      switch(true) {
+        case(receivedMessage.quick_reply):
+          if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
+            let payload = receivedMessage.quick_reply.payload
+            if (payload === 'siPrenota') {
+              if (varConsultazioni[senderPsid].prenotaEsame(true) === true) {
+                risposta = {
+                  'text': 'Hai prenotato'
+                }
+              } else {
+                risposta = {
+                  'text': 'Non sono riuscito a prenotare'
+                }
+              }
+            } else if (payload === 'noPrenota') {
+              risposta = {
+                'text': 'Non hai prenotato'
+              }
+            }
+            await callSendAPI(senderPsid, risposta)
+          } else {
+            console.log('Mi aspettavo una quick reply')
+            risposta = {
+              'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
+            }
+            await callSendAPI(senderPsid, risposta)
+          }
+          break
+
+        case(receivedMessage.attachments):
+          _chiediProssimaPrenotazione(senderPsid)
+          break
+
+        case(receivedMessage.text):
+          _chiediProssimaPrenotazione(senderPsid)
+          break
+
+        default:
+          _chiediProssimaPrenotazione(senderPsid)
+          break
+
+      }
+      break
+
+    default:
+      break
+
   }
 
-  if ((varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === false) && (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === false)) {
-    risposta = {
-      'text': 'Hai prenotato tutti gli esami nella ricetta'
+  if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
+    switch(true) {
+      case (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
+        _chiediProssimoDato(senderPsid)
+        break
+
+      case (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
+        _chiediProssimaPrenotazione(senderPsid)
+        tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
+        break
+      
+      default:
+        risposta = {
+          'text': 'Hai prenotato tutti gli esami nella ricetta'
+        }
+        await callSendAPI(senderPsid, risposta)
+        delete varConsultazioni[senderPsid]
     }
-    await callSendAPI(senderPsid, risposta)
-    delete varConsultazioni[senderPsid]
   }
+  
 }
 
 /**
