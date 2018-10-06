@@ -340,9 +340,7 @@ async function handleMessage (senderPsid, receivedMessage) {
       break
 
     case (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
-      if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-        await _chiediProssimaPrenotazione(senderPsid)
-      }
+      await _chiediProssimaPrenotazione(senderPsid)
       break
 
     default:
