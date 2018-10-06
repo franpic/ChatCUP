@@ -157,7 +157,7 @@ function _chiediProssimaPrenotazione (senderPsid) {
           'buttons': [{
             'type': 'postback',
             'title': 'Prenota',
-            'payload': appuntamento
+            'payload': 'prenotaAppuntamento ' + appuntamento['momento']
           }]
         })
       }
@@ -391,7 +391,7 @@ async function handlePostback (senderPsid, receivedPostback) {
 
       _chiediProssimoDato(senderPsid)
     }
-  } else if (payload['presidio'] !== undefined) {
+  } else if (payload.includes('prenotaAppuntamento')) {
     sTesto = 'Note ed Avvertenze:\n' + await varConsultazioni[senderPsid].getNoteAvvertenze()
     risposta = {
       'text': sTesto
