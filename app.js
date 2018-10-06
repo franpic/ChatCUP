@@ -292,11 +292,11 @@ async function handleMessage (senderPsid, receivedMessage) {
             if (payload === 'siPrenota') {
               if (await varConsultazioni[senderPsid].prenotaEsame(true) === true) {
                 risposta = {
-                  'text': 'Hai prenotato'
+                  'text': 'L\'esame è stato prenotato'
                 }
               } else {
                 risposta = {
-                  'text': 'Non sono riuscito a prenotare'
+                  'text': 'Non sono riuscito a prenotare l\'esame'
                 }
               }
             } else if (payload === 'noPrenota') {
@@ -342,7 +342,7 @@ async function handleMessage (senderPsid, receivedMessage) {
     case (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
       await _chiediProssimaPrenotazione(senderPsid)
       break
-      
+
     default:
       risposta = {
         'text': 'Hai prenotato tutti gli esami nella ricetta'
