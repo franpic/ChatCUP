@@ -101,7 +101,7 @@ app.post('/webhook', (req, res) => {
  * @returns {Boolean} true se viene chiesto un prossimo dato, false altrimenti
  */
 function _chiediProssimoDato (senderPsid) {
-  return new Promise((resolve, reject) => {
+  return new Promise(async function (resolve, reject) {
     var risposta
 
     // Se c'è, chiede il prossimo dato mancante
