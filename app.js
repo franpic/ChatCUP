@@ -103,7 +103,7 @@ app.post('/webhook', (req, res) => {
 function _chiediProssimoDato (senderPsid) {
   return new Promise((resolve, reject) => {
     var risposta
-  
+
     // Se c'è, chiede il prossimo dato mancante
     if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
       risposta = {
@@ -134,7 +134,7 @@ function _chiediProssimoDato (senderPsid) {
 }
 
 function _chiediProssimaPrenotazione (senderPsid) {
-  new Promise (async function(resolve, reject) {
+  new Promise(async function (resolve, reject) {
     var risposta = null
     var datiEsame = await varConsultazioni[senderPsid].getDatiProssimoEsame()
     if (datiEsame !== null) {
@@ -142,15 +142,15 @@ function _chiediProssimaPrenotazione (senderPsid) {
         'text': 'Ecco gli appuntamenti per l\'esame ' + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
       }
       await callSendAPI(senderPsid, risposta)
-  
+
       var listaAppuntamenti = await varConsultazioni[senderPsid].getListaDisponibilita()
       var elementi = []
       risposta = {}
-  
+
       for (var appuntamento of listaAppuntamenti) {
         var giornoDellaSettimana = appuntamento['momento'].getDay()
         const nomiGiorniSettimana = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
-  
+
         elementi.push({
           'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
           'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
@@ -161,7 +161,7 @@ function _chiediProssimaPrenotazione (senderPsid) {
           }]
         })
       }
-  
+
       risposta = {
         'attachment': {
           'type': 'template',
@@ -169,18 +169,18 @@ function _chiediProssimaPrenotazione (senderPsid) {
             'template_type': 'generic',
             'elements': elementi
           }
-  
+
         }
       }
       await callSendAPI(senderPsid, risposta)
-  
+
       tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
-      resolve (true)
+      resolve(true)
     } else {
       reject(new Error(false))
     }
   })
-    .catch( errore => {
+    .catch(errore => {
       console.error(errore)
       return false
     })
@@ -226,10 +226,10 @@ async function handleMessage (senderPsid, receivedMessage) {
   var risposta
   const S_MESSAGGIO_TIPO_INPUT = 'Mi spiace ma non ho capito.'
 
-  switch(true) {
+  switch (true) {
     case (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
-      switch(true) {
-        case(receivedMessage.quick_reply !== undefined):
+      switch (true) {
+        case (receivedMessage.quick_reply !== undefined):
           if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
             var payload = receivedMessage.quick_reply.payload
             varConsultazioni[senderPsid].setValoreInDato(payload)
@@ -237,7 +237,7 @@ async function handleMessage (senderPsid, receivedMessage) {
           }
           break
 
-        case(receivedMessage.attachments !== undefined):
+        case (receivedMessage.attachments !== undefined):
           // Recupera l'url dell'allegato
           let attachmentUrl = receivedMessage.attachments[0].payload.url
           let risposteRapide = []
@@ -268,7 +268,7 @@ async function handleMessage (senderPsid, receivedMessage) {
           await callSendAPI(senderPsid, risposta)
           break
 
-        case(receivedMessage.text !== undefined):
+        case (receivedMessage.text !== undefined):
           if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.TEXT) {
             if (varConsultazioni[senderPsid].setValoreInDato(receivedMessage.text) === false) {
               risposta = {
@@ -276,7 +276,7 @@ async function handleMessage (senderPsid, receivedMessage) {
               }
               await callSendAPI(senderPsid, risposta)
             }
-          }  
+          }
           break
 
         default:
@@ -285,8 +285,8 @@ async function handleMessage (senderPsid, receivedMessage) {
       break
 
     case (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
-      switch(true) {
-        case(receivedMessage.quick_reply !== undefined):
+      switch (true) {
+        case (receivedMessage.quick_reply !== undefined):
           if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
             let payload = receivedMessage.quick_reply.payload
             if (payload === 'siPrenota') {
@@ -314,27 +314,25 @@ async function handleMessage (senderPsid, receivedMessage) {
           }
           break
 
-        case(receivedMessage.attachments !== undefined):
+        case (receivedMessage.attachments !== undefined):
           await _chiediProssimaPrenotazione(senderPsid)
           break
 
-        case(receivedMessage.text !== undefined):
+        case (receivedMessage.text !== undefined):
           await _chiediProssimaPrenotazione(senderPsid)
           break
 
         default:
           await _chiediProssimaPrenotazione(senderPsid)
           break
-
       }
       break
 
     default:
       break
-
   }
 
-  switch(true) {
+  switch (true) {
     case (await varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
       if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
         await _chiediProssimoDato(senderPsid)
@@ -355,7 +353,6 @@ async function handleMessage (senderPsid, receivedMessage) {
       delete varConsultazioni[senderPsid]
       break
   }
-
 }
 
 /**

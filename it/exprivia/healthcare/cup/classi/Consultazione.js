@@ -114,7 +114,7 @@ class Consultazione {
   hasProssimoDatoDaChiedere () {
     return new Promise((resolve, reject) => {
       var dato = this._getProssimoDato()
-  
+
       if (dato === null) {
         reject(new Error(false))
       } else {
