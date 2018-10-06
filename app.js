@@ -217,7 +217,7 @@ async function handleMessage (senderPsid, receivedMessage) {
   switch(true) {
     case (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
       switch(true) {
-        case(receivedMessage.quick_reply):
+        case(receivedMessage.quick_reply !== undefined):
           if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
             var payload = receivedMessage.quick_reply.payload
             varConsultazioni[senderPsid].setValoreInDato(payload)
@@ -225,7 +225,7 @@ async function handleMessage (senderPsid, receivedMessage) {
           }
           break
 
-        case(receivedMessage.attachments):
+        case(receivedMessage.attachments !== undefined):
           // Recupera l'url dell'allegato
           let attachmentUrl = receivedMessage.attachments[0].payload.url
           let risposteRapide = []
@@ -256,7 +256,7 @@ async function handleMessage (senderPsid, receivedMessage) {
           await callSendAPI(senderPsid, risposta)
           break
 
-        case(receivedMessage.text):
+        case(receivedMessage.text !== undefined):
           if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.TEXT) {
             if (varConsultazioni[senderPsid].setValoreInDato(receivedMessage.text) === false) {
               risposta = {
@@ -274,7 +274,7 @@ async function handleMessage (senderPsid, receivedMessage) {
 
     case (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
       switch(true) {
-        case(receivedMessage.quick_reply):
+        case(receivedMessage.quick_reply !== undefined):
           if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
             let payload = receivedMessage.quick_reply.payload
             if (payload === 'siPrenota') {
@@ -302,11 +302,11 @@ async function handleMessage (senderPsid, receivedMessage) {
           }
           break
 
-        case(receivedMessage.attachments):
+        case(receivedMessage.attachments !== undefined):
           _chiediProssimaPrenotazione(senderPsid)
           break
 
-        case(receivedMessage.text):
+        case(receivedMessage.text !== undefined):
           _chiediProssimaPrenotazione(senderPsid)
           break
 
@@ -341,7 +341,7 @@ async function handleMessage (senderPsid, receivedMessage) {
         delete varConsultazioni[senderPsid]
     }
   }
-  
+
 }
 
 /**
