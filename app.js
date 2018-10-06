@@ -127,51 +127,58 @@ function _chiediProssimoDato (senderPsid) {
   }
 }
 
-async function _chiediProssimaPrenotazione (senderPsid) {
-  var risposta = null
-  var datiEsame = varConsultazioni[senderPsid].getDatiProssimoEsame()
-  if (datiEsame !== null) {
-    risposta = {
-      'text': 'Ecco gli appuntamenti per l\'esame ' + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
-    }
-    await callSendAPI(senderPsid, risposta)
-
-    var listaAppuntamenti = await varConsultazioni[senderPsid].getListaDisponibilita()
-    var elementi = []
-    risposta = {}
-
-    for (var appuntamento of listaAppuntamenti) {
-      var giornoDellaSettimana = appuntamento['momento'].getDay()
-      const nomiGiorniSettimana = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
-
-      elementi.push({
-        'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
-        'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
-        'buttons': [{
-          'type': 'postback',
-          'title': 'Prenota',
-          'payload': 'sceltaAppuntamento ' + appuntamento.toLocaleString()
-        }]
-      })
-    }
-
-    risposta = {
-      'attachment': {
-        'type': 'template',
-        'payload': {
-          'template_type': 'generic',
-          'elements': elementi
-        }
-
+function _chiediProssimaPrenotazione (senderPsid) {
+  var t = this
+  new Promise (async function(resolve, reject) {
+    var risposta = null
+    var datiEsame = t.varConsultazioni[senderPsid].getDatiProssimoEsame()
+    if (datiEsame !== null) {
+      risposta = {
+        'text': 'Ecco gli appuntamenti per l\'esame ' + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
       }
+      await t.callSendAPI(senderPsid, risposta)
+  
+      var listaAppuntamenti = await varConsultazioni[senderPsid].getListaDisponibilita()
+      var elementi = []
+      risposta = {}
+  
+      for (var appuntamento of listaAppuntamenti) {
+        var giornoDellaSettimana = appuntamento['momento'].getDay()
+        const nomiGiorniSettimana = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
+  
+        elementi.push({
+          'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
+          'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
+          'buttons': [{
+            'type': 'postback',
+            'title': 'Prenota',
+            'payload': 'sceltaAppuntamento ' + appuntamento.toLocaleString()
+          }]
+        })
+      }
+  
+      risposta = {
+        'attachment': {
+          'type': 'template',
+          'payload': {
+            'template_type': 'generic',
+            'elements': elementi
+          }
+  
+        }
+      }
+      await t.callSendAPI(senderPsid, risposta)
+  
+      t.tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
+      resolve (true)
+    } else {
+      reject(new Error(false))
     }
-    await callSendAPI(senderPsid, risposta)
-
-    tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
-    return true
-  } else {
-    return false
-  }
+  })
+    .catch( errore => {
+      console.error(errore)
+      return false
+    })
 }
 
 /**
@@ -303,15 +310,15 @@ async function handleMessage (senderPsid, receivedMessage) {
           break
 
         case(receivedMessage.attachments !== undefined):
-          _chiediProssimaPrenotazione(senderPsid)
+          await _chiediProssimaPrenotazione(senderPsid)
           break
 
         case(receivedMessage.text !== undefined):
-          _chiediProssimaPrenotazione(senderPsid)
+          await _chiediProssimaPrenotazione(senderPsid)
           break
 
         default:
-          _chiediProssimaPrenotazione(senderPsid)
+          await _chiediProssimaPrenotazione(senderPsid)
           break
 
       }
@@ -329,8 +336,7 @@ async function handleMessage (senderPsid, receivedMessage) {
         break
 
       case (varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
-        _chiediProssimaPrenotazione(senderPsid)
-        tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
+        await _chiediProssimaPrenotazione(senderPsid)
         break
       
       default:
