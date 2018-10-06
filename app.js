@@ -289,7 +289,7 @@ async function handleMessage (senderPsid, receivedMessage) {
         case (receivedMessage.quick_reply !== undefined):
           if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
             let payload = receivedMessage.quick_reply.payload
-            if (payload['momento']) {
+            if ('siPrenota') {
               if (await varConsultazioni[senderPsid].prenotaEsame(true) === true) {
                 risposta = {
                   'text': 'L\'esame è stato prenotato.\n' + 
@@ -405,7 +405,7 @@ async function handlePostback (senderPsid, receivedPostback) {
         {
           'content_type': 'text',
           'title': 'Si',
-          'payload': payload
+          'payload': 'siPrenota'
         },
         {
           'content_type': 'text',
