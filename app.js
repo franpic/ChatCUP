@@ -105,7 +105,7 @@ function _chiediProssimoDato (senderPsid) {
     var risposta
 
     // Se c'è, chiede il prossimo dato mancante
-    if (varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
+    if (await varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
       risposta = {
         'attachment': {
           'type': 'template',
