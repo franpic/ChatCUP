@@ -177,9 +177,9 @@ function _chiediProssimoDato (senderPsid) {
         await callSendAPI(senderPsid, messaggio)
 
         resolve(true)
-    } else {
-      resolve(false)
-    }
+      } else {
+        resolve(false)
+      }
   })
     .catch(errore => {
       console.error(errore)
@@ -460,7 +460,8 @@ async function handleMessage (senderPsid, receivedMessage) {
               }
               await callSendAPI(senderPsid, messaggio)
 
-              if (await _chiediProssimaPrenotazione(senderPsid) === false) {
+              var esito = await _chiediProssimaPrenotazione(senderPsid) //Workaround. Capire perchè a volte restituisce undefined
+              if (esito === false || esito === undefined) {
                 messaggio = {
                   'text': 'Hai prenotato tutti gli esami di questa ricetta'
                 }
