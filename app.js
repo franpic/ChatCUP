@@ -352,6 +352,7 @@ async function handleMessage (senderPsid, receivedMessage) {
                   await callSendAPI(senderPsid, messaggio)
 
                   varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.EMAIL
+                  tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
                   messaggio = {
                     'text': 'Desideri ricevere il riepilogo della prenotazione per email?',
                     'quick_replies': [
@@ -368,9 +369,6 @@ async function handleMessage (senderPsid, receivedMessage) {
                     ]
                   }
                   await callSendAPI(senderPsid, messaggio)
-                  tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
-
-                  varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.EMAIL
                 } else {
                   messaggio = {
                     'text': "Non sono riuscito a prenotare l'esame"
