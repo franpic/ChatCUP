@@ -34,7 +34,6 @@ class Consultazione {
       'citta': '',
       'presidio': ''
     }
-
   }
 
   /**
@@ -230,7 +229,7 @@ class Consultazione {
     }
   }
 
-  _getPrescrizioneElettronica (data, ) {
+  _getPrescrizioneElettronica (data) {
     var t = this
 
     return new Promise(async function (resolve, reject) {
@@ -328,6 +327,7 @@ class Consultazione {
 
     return new Promise(async function (resolve, reject) {
       const varWebServicesHCup = new WebServicesHCup()
+      var codCatalogoPrescr = ''
       const listaAppuntamenti = await varWebServicesHCup.getListaDisponibilita(codCatalogoPrescr, t.filtriAppuntamenti['date'], t.filtriAppuntamenti['citta'], t.filtriAppuntamenti['presidio'])
       resolve(listaAppuntamenti)
     })
@@ -356,14 +356,13 @@ class Consultazione {
     if (esame === null) {
       return false
     } else {
+      this.filtriAppuntamenti = {
+        'date': '',
+        'citta': '',
+        'presidio': ''
+      }
       esame['isPrenotato'] = varWebServicesHCup.setPrenota(isConfermato)
       return esame['isPrenotato']
-    }
-
-    this.filtriAppuntamenti = {
-      'date': '',
-      'citta': '',
-      'presidio': ''
     }
   }
 }

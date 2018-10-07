@@ -198,13 +198,11 @@ function _chiediProssimaPrenotazione (senderPsid) {
             'content_type': 'text',
             'title': 'Filtra per Presidio',
             'payload': 'filtroPresidio'
-          },
+          }
         ]
 
       }
       await callSendAPI(senderPsid, messaggio)
-
-
 
       resolve(true)
     } else {
@@ -420,13 +418,13 @@ async function handleMessage (senderPsid, receivedMessage) {
 
               case ('filtroData'):
                 break
-              
+
               case ('filtroCitta'):
-                
+
                 break
 
               case ('filtroPresidio'):
-                
+
                 break
 
               default:

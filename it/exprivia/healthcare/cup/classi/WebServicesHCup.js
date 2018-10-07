@@ -152,19 +152,18 @@ class WebServicesHCup {
         'localitaPresidio': ''
       }
     }
-    
+
     var numPresidioELocalita = Math.floor(Math.random() * 10) + 1
-    
+
     appuntamento['momento'] = new Date(dataInizio.getTime() + Math.random() * (dataFine.getTime() - dataInizio.getTime()))
     appuntamento['momento'].setHours(orarioInizio + Math.random() * (orarioFine - orarioInizio))
-    
-    
+
     if (citta === '') {
       appuntamento['presidio']['localitaPresidio'] = 'Località ' + numPresidioELocalita
     } else {
       appuntamento['presidio']['localitaPresidio'] = citta
     }
-    
+
     if (presidio === '') {
       appuntamento['presidio']['nomePresidio'] = 'Località ' + numPresidioELocalita
     } else {
