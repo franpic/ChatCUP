@@ -457,7 +457,7 @@ async function handleMessage (senderPsid, receivedMessage) {
             if (re.test(receivedMessage.text)) {
               indirizzoEmail = re.exec(receivedMessage.text)
               messaggio = {
-                'text': "Ti ho inviatoil riepilogo all'indirizzo " + indirizzoEmail
+                'text': "Ti ho inviato il riepilogo all'indirizzo " + indirizzoEmail
               }
               await callSendAPI(senderPsid, messaggio)
 
@@ -489,7 +489,7 @@ async function handleMessage (senderPsid, receivedMessage) {
             } else {
               tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
               messaggio = {
-                'text': "Questo indirizzo email non ha la giusta forma. Potresti verificare e reinviarmelo?"
+                'text': 'Questo indirizzo email non ha la giusta forma. Potresti verificare e reinviarmelo?'
               }
               await callSendAPI(senderPsid, messaggio)
             }
@@ -563,7 +563,7 @@ async function handlePostback (senderPsid, receivedPostback) {
   if (payload === 'inizia') {
     varConsultazioni[senderPsid] = new Consultazione()
     varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.RACCOLTA_DATI
-    
+
     var debug = false
     if (debug === true) {
       await varConsultazioni[senderPsid].setValoreInDato('PCCFNC88C20F262P')
@@ -577,7 +577,7 @@ async function handlePostback (senderPsid, receivedPostback) {
       await callSendAPI(senderPsid, messaggio)
 
       messaggio = {
-        'text': 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' + 
+        'text': 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' +
                 varConsultazioni[senderPsid].getListaDati()
       }
       await callSendAPI(senderPsid, messaggio)
@@ -590,6 +590,7 @@ async function handlePostback (senderPsid, receivedPostback) {
     }
     await callSendAPI(senderPsid, messaggio)
 
+    tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
     messaggio = {
       'text': 'Confermi la prenotazione?',
       'quick_replies': [
@@ -607,7 +608,6 @@ async function handlePostback (senderPsid, receivedPostback) {
     }
     await callSendAPI(senderPsid, messaggio)
 
-    tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
   } else {
     messaggio = {
       'text': 'Mi spiace ma non ho capito'
