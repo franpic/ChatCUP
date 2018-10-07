@@ -25,7 +25,7 @@ class Consultazione {
     this.ENUM_FASI = Object.freeze({
       RACCOLTA_DATI: 'dati',
       PRENOTAZIONE_ESAMI: 'prenotazioneEsame',
-      EMAIL: 'postback',
+      EMAIL: 'email',
       SUGGERIMENTI: 'suggerimenti'
     })
     this.fase = null

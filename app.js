@@ -416,7 +416,8 @@ async function handleMessage (senderPsid, receivedMessage) {
                 break
 
               case ('noEmail'):
-                if (await _chiediProssimaPrenotazione(senderPsid) === false) {
+                var esito = await _chiediProssimaPrenotazione(senderPsid) //@todo La seconda condizione è solo un workaround. Capire perchè a volte restituisce undefined
+                if (esito === false || esito === undefined) {
                   messaggio = {
                     'text': 'Hai prenotato tutti gli esami di questa ricetta'
                   }
