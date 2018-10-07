@@ -247,7 +247,7 @@ async function handleMessage (senderPsid, receivedMessage) {
   if (tipoDatoAtteso.includes(tipoDatoArrivato)) {
     switch (varConsultazioni[senderPsid].fase) {
       case (varConsultazioni[senderPsid].ENUM_FASI.RACCOLTA_DATI):
-        switch (true) {
+        switch (tipoDatoArrivato) {
           case (ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY):
             var payload = receivedMessage.quick_reply.payload
             switch (payload) {
