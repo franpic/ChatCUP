@@ -108,6 +108,7 @@ function _chiediProssimoDato (senderPsid) {
 
     // Se c'è, chiede il prossimo dato mancante
     if (await varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
+      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
       messaggio = {
         'attachment': {
           'type': 'template',
@@ -123,7 +124,6 @@ function _chiediProssimoDato (senderPsid) {
         }
       }
       callSendAPI(senderPsid, messaggio)
-      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
       resolve(true)
     } else {
       resolve(false)
