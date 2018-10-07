@@ -23,10 +23,10 @@ class Consultazione {
     this._ultimiValoriRiconosciutiDaOcr = null
     this._ultimiEsamiEstrattiDaRicetta = null
     this.ENUM_FASI = Object.freeze({
-      DATI: 'dati',
-      PRENOTAZIONE_ESAME: 'prenotazioneEsame',
+      RACCOLTA_DATI: 'dati',
+      PRENOTAZIONE_ESAMI: 'prenotazioneEsame',
       EMAIL: 'postback',
-      NOTE: 'note'
+      SUGGERIMENTI: 'suggerimenti'
     })
     this.fase = null
   }
@@ -51,6 +51,10 @@ class Consultazione {
     }
 
     return prossimoDato
+  }
+
+  setPerProssimaRicetta () {
+    this._arrDati[2] = new NumeroRicettaElettronica()
   }
 
   /**
@@ -343,6 +347,11 @@ class Consultazione {
       esame['isPrenotato'] = varWebServicesHCup.setPrenota(isConfermato)
       return esame['isPrenotato']
     }
+  }
+
+  preparaPerProssimaRicetta () {
+    this._arrDati[2] = new NumeroRicettaElettronica()
+    this.fase = this.ENUM_FASI.RACCOLTA_DATI
   }
 }
 
