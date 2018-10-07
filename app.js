@@ -133,51 +133,50 @@ function _chiediProssimoDato (senderPsid) {
       console.error(errore)
       return false
     })
-}
-
-function _chiediProssimaPrenotazione (senderPsid) {
-  new Promise(async function (resolve, reject) {
-    var messaggio = null
-    var datiEsame = await varConsultazioni[senderPsid].getDatiProssimoEsame()
-    if (datiEsame !== null) {
-      messaggio = {
-        'text': "Ecco gli appuntamenti per l'esame " + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
-      }
-      await callSendAPI(senderPsid, messaggio)
-
-      var listaAppuntamenti = await varConsultazioni[senderPsid].getListaDisponibilita()
-      var elementi = []
-      messaggio = {}
-
-      for (var appuntamento of listaAppuntamenti) {
-        var giornoDellaSettimana = appuntamento['momento'].getDay()
-        const nomiGiorniSettimana = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
-
-        elementi.push({
-          'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
-          'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
-          'buttons': [{
-            'type': 'postback',
-            'title': 'Prenota',
-            'payload': 'prenotaAppuntamento ' + appuntamento['momento']
-          }]
-        })
-      }
-
-      messaggio = {
-        'attachment': {
-          'type': 'template',
-          'payload': {
-            'template_type': 'generic',
-            'elements': elementi
-          }
-
+  }
+  
+  function _chiediProssimaPrenotazione (senderPsid) {
+    new Promise(async function (resolve, reject) {
+      var messaggio = null
+      var datiEsame = await varConsultazioni[senderPsid].getDatiProssimoEsame()
+      if (datiEsame !== null) {
+        messaggio = {
+          'text': "Ecco gli appuntamenti per l'esame " + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
         }
-      }
-      await callSendAPI(senderPsid, messaggio)
+        await callSendAPI(senderPsid, messaggio)
+        
+        var listaAppuntamenti = await varConsultazioni[senderPsid].getListaDisponibilita()
+        var elementi = []
+        messaggio = {}
+        
+        for (var appuntamento of listaAppuntamenti) {
+          var giornoDellaSettimana = appuntamento['momento'].getDay()
+          const nomiGiorniSettimana = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
+          
+          elementi.push({
+            'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
+            'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
+            'buttons': [{
+              'type': 'postback',
+              'title': 'Prenota',
+              'payload': 'prenotaAppuntamento ' + appuntamento['momento']
+            }]
+          })
+        }
+        
+        tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
+        messaggio = {
+          'attachment': {
+            'type': 'template',
+            'payload': {
+              'template_type': 'generic',
+              'elements': elementi
+            }
+          }
+        }
+        await callSendAPI(senderPsid, messaggio)
 
-      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
-      resolve(true)
+        resolve(true)
     } else {
       resolve(false)
     }
@@ -411,11 +410,11 @@ async function handleMessage (senderPsid, receivedMessage) {
             let payload = receivedMessage.quick_reply.payload
             switch (payload) {
               case ('siEmail'):
+                tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
                 messaggio = {
                   'text': 'A quale indirizzo email preferisci ricevere il riepilogo?'
                 }
                 await callSendAPI(senderPsid, messaggio)
-                tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
                 break
 
               case ('noEmail'):
