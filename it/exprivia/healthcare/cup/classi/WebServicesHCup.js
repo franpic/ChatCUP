@@ -144,7 +144,7 @@ class WebServicesHCup {
    * @param {*} orarioInizio
    * @param {*} orarioFine
    */
-  _getAppuntamentoCasuale (dataInizio, dataFine, orarioInizio, orarioFine) {
+  _getAppuntamentoCasuale (dataInizio, dataFine, orarioInizio, orarioFine, citta, presidio) {
     var appuntamento = {
       'momento': '',
       'presidio': {
@@ -152,14 +152,25 @@ class WebServicesHCup {
         'localitaPresidio': ''
       }
     }
+    
     var numPresidioELocalita = Math.floor(Math.random() * 10) + 1
-
+    
     appuntamento['momento'] = new Date(dataInizio.getTime() + Math.random() * (dataFine.getTime() - dataInizio.getTime()))
     appuntamento['momento'].setHours(orarioInizio + Math.random() * (orarioFine - orarioInizio))
-
-    appuntamento['presidio']['nomePresidio'] = 'Presidio' + numPresidioELocalita
-    appuntamento['presidio']['localitaPresidio'] = 'Località ' + numPresidioELocalita
-
+    
+    
+    if (citta === '') {
+      appuntamento['presidio']['localitaPresidio'] = 'Località ' + numPresidioELocalita
+    } else {
+      appuntamento['presidio']['localitaPresidio'] = citta
+    }
+    
+    if (presidio === '') {
+      appuntamento['presidio']['nomePresidio'] = 'Località ' + numPresidioELocalita
+    } else {
+      appuntamento['presidio']['nomePresidio'] = presidio
+    }
+    
     return (appuntamento)
   }
 
@@ -167,21 +178,21 @@ class WebServicesHCup {
    * @todo ATTENZIONE! QUESTO E' UNO STUB DA MODIFICARE IL PRIMA POSSIBILE!
    * Restituisce la lista degli appuntamenti di un esame, fornito il codice dell'esame.
    *
-   * @param {dettaglioPrescrizioneElettronica[]} numRicettaElettronica il numero della ricetta elettronica, composto dalla concatenazione delle parti X e Y
+   * @param {codCatalogoPrescr} numRicettaElettronica il numero della ricetta elettronica, composto dalla concatenazione delle parti X e Y
    */
-  getListaDisponibilita (codCatalogoPrescr) {
+  getListaDisponibilita (codCatalogoPrescr, date, citta, presidio) {
     var t = this
 
     return new Promise(function (resolve, reject) {
       const numAppuntamentiDaRestituire = Math.floor(Math.random() * 10) + 1
-      var ultimaDataPresa = new Date()
+      var ultimaDataPresa = date
       var dataLimite = new Date(ultimaDataPresa)
       dataLimite.setDate(dataLimite.getDate() + 10)
 
       var appuntamentiDaRestituire = []
 
       for (var i = 0; i < numAppuntamentiDaRestituire; i++) {
-        var ultimoAppuntamento = t._getAppuntamentoCasuale(ultimaDataPresa, dataLimite, 8, 20)
+        var ultimoAppuntamento = t._getAppuntamentoCasuale(ultimaDataPresa, dataLimite, 8, 20, citta, presidio)
         ultimaDataPresa = ultimoAppuntamento['momento']
         appuntamentiDaRestituire.push(ultimoAppuntamento)
       }

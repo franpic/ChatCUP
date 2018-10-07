@@ -219,7 +219,7 @@ class Consultazione {
     }
   }
 
-  _getPrescrizioneElettronica () {
+  _getPrescrizioneElettronica (data, ) {
     var t = this
 
     return new Promise(async function (resolve, reject) {
@@ -312,12 +312,12 @@ class Consultazione {
     }
   }
 
-  getListaDisponibilita () {
+  getListaDisponibilita (date, citta, presidio) {
     var t = this
 
     return new Promise(async function (resolve, reject) {
       const varWebServicesHCup = new WebServicesHCup()
-      const listaAppuntamenti = await varWebServicesHCup.getListaDisponibilita(t._arrDati[0], t._arrDati[2])
+      const listaAppuntamenti = await varWebServicesHCup.getListaDisponibilita(codCatalogoPrescr, date, citta, presidio)
       resolve(listaAppuntamenti)
     })
       .catch(errore => {

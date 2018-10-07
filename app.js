@@ -154,7 +154,7 @@ function _chiediProssimaPrenotazione (senderPsid) {
         const nomiGiorniSettimana = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
 
         elementi.push({
-          'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
+          'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].getDate() + '/' + (appuntamento['momento'].getMonth() + 1) + '/' + appuntamento['momento'].getFullYear() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
           'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
           'buttons': [{
             'type': 'postback',
@@ -177,21 +177,26 @@ function _chiediProssimaPrenotazione (senderPsid) {
       await callSendAPI(senderPsid, messaggio)
 
       messaggio = {
-        'text': 'Se vuoi puoi filtrare per',
+        'text': 'Toccando uno dei seguenti comandi puoi filtrare la lista appena mostrata o azzerare i filtri presenti',
         'quick_replies': [
           {
             'content_type': 'text',
-            'title': 'Giorno',
+            'title': 'Azzera Filtri',
+            'payload': 'filtroAzzera'
+          },
+          {
+            'content_type': 'text',
+            'title': 'Filtra per Giorno',
             'payload': 'filtroGiorno'
           },
           {
             'content_type': 'text',
-            'title': 'Città',
+            'title': 'Filtra per Città',
             'payload': 'filtroCitta'
           },
           {
             'content_type': 'text',
-            'title': 'Presidio',
+            'title': 'Filtra per Presidio',
             'payload': 'filtroPresidio'
           },
         ]
@@ -411,6 +416,18 @@ async function handleMessage (senderPsid, receivedMessage) {
                 }
                 await callSendAPI(senderPsid, messaggio)
                 await _chiediProssimaPrenotazione(senderPsid)
+                break
+
+              case ('filtroGiorno'):
+                
+                break
+              
+              case ('filtroCitta'):
+                
+                break
+
+              case ('filtroPresidio'):
+                
                 break
 
               default:
