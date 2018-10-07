@@ -29,6 +29,12 @@ class Consultazione {
       SUGGERIMENTI: 'suggerimenti'
     })
     this.fase = null
+    this.filtriAppuntamenti = {
+      'date': '',
+      'citta': '',
+      'presidio': ''
+    }
+
   }
 
   /**
@@ -56,6 +62,11 @@ class Consultazione {
   setPerProssimaRicetta () {
     this._arrDati[2] = new NumeroRicettaElettronica()
     this._ultimiEsamiEstrattiDaRicetta = null
+    this.filtriAppuntamenti = {
+      'date': '',
+      'citta': '',
+      'presidio': ''
+    }
   }
 
   /**
@@ -312,12 +323,12 @@ class Consultazione {
     }
   }
 
-  getListaDisponibilita (date, citta, presidio) {
+  getListaDisponibilita () {
     var t = this
 
     return new Promise(async function (resolve, reject) {
       const varWebServicesHCup = new WebServicesHCup()
-      const listaAppuntamenti = await varWebServicesHCup.getListaDisponibilita(codCatalogoPrescr, date, citta, presidio)
+      const listaAppuntamenti = await varWebServicesHCup.getListaDisponibilita(codCatalogoPrescr, t.filtriAppuntamenti['date'], t.filtriAppuntamenti['citta'], t.filtriAppuntamenti['presidio'])
       resolve(listaAppuntamenti)
     })
       .catch(errore => {
@@ -348,11 +359,12 @@ class Consultazione {
       esame['isPrenotato'] = varWebServicesHCup.setPrenota(isConfermato)
       return esame['isPrenotato']
     }
-  }
 
-  preparaPerProssimaRicetta () {
-    this._arrDati[2] = new NumeroRicettaElettronica()
-    this.fase = this.ENUM_FASI.RACCOLTA_DATI
+    this.filtriAppuntamenti = {
+      'date': '',
+      'citta': '',
+      'presidio': ''
+    }
   }
 }
 

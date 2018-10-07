@@ -170,7 +170,7 @@ class WebServicesHCup {
     } else {
       appuntamento['presidio']['nomePresidio'] = presidio
     }
-    
+
     return (appuntamento)
   }
 
@@ -180,12 +180,12 @@ class WebServicesHCup {
    *
    * @param {codCatalogoPrescr} numRicettaElettronica il numero della ricetta elettronica, composto dalla concatenazione delle parti X e Y
    */
-  getListaDisponibilita (codCatalogoPrescr, date, citta, presidio) {
+  getListaDisponibilita (codCatalogoPrescr, data, citta, presidio) {
     var t = this
 
     return new Promise(function (resolve, reject) {
       const numAppuntamentiDaRestituire = Math.floor(Math.random() * 10) + 1
-      var ultimaDataPresa = date
+      var ultimaDataPresa = new Date(Number(data.substr(6, 4)), Number(data.substr(3, 2)), Number(data.substr(0, 2)))
       var dataLimite = new Date(ultimaDataPresa)
       dataLimite.setDate(dataLimite.getDate() + 10)
 

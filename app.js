@@ -186,8 +186,8 @@ function _chiediProssimaPrenotazione (senderPsid) {
           },
           {
             'content_type': 'text',
-            'title': 'Filtra per Giorno',
-            'payload': 'filtroGiorno'
+            'title': 'Filtra da Data',
+            'payload': 'filtroData'
           },
           {
             'content_type': 'text',
@@ -418,8 +418,7 @@ async function handleMessage (senderPsid, receivedMessage) {
                 await _chiediProssimaPrenotazione(senderPsid)
                 break
 
-              case ('filtroGiorno'):
-                
+              case ('filtroData'):
                 break
               
               case ('filtroCitta'):
