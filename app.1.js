@@ -1,7 +1,8 @@
 /**
  * @todo Implementare i corrispettivi testuali delle quick_eplies richiedendo solo le quickreplies se il testo è sbagliato
- * @todo Gestire concorrenza delle consultazioni
- *
+ * @todo secondo me, al momento troppo del lavoro di Consultazione al momento viene fatto da app. I due moduli al momento non sono totalmente indipendenti
+ * @todo linea 277 è più giusto che la frase di ko provenga dal setValoreInDato e che quindi questo restituisca un oggetto con esito true o false e frase descrittiva
+ * @todo linea 319 Il numero Coupon deve provenire da Consultazione e non essere generato quì, nel rispetto di ciò che sta venendo stubbato
  */
 
 /**
@@ -25,6 +26,7 @@ const Consultazione = require('./it/exprivia/healthcare/cup/classi/Consultazione
 var varConsultazioni = {}
 const ENUM_TIPO_INPUT_UTENTE = Object.freeze({
   TEXT: 'text',
+  ATTACHMENTS: 'attachments',
   QUICK_REPLY: 'quick_reply',
   POSTBACK: 'postback'
 })
@@ -46,11 +48,11 @@ app.get('/webhook', (req, res) => {
   if (mode && token) {
     // Controlla se token e mode inviati sono corretti
     if (mode === 'subscribe' && token === VERIFY_TOKEN) {
-      // Risponde con '200 OK' ed il token di ingaggio preso dalla richiesta
+      // Risponde con "200 OK" ed il token di ingaggio preso dalla richiesta
       console.log('WEBHOOK_VERIFIED')
       res.status(200).send(challenge)
     } else {
-      // Risponde con '403 Forbidden' se i token di verifica non corrispondono
+      // Risponde con "403 Forbidden" se i token di verifica non corrispondono
       res.sendStatus(403)
     }
   }
@@ -86,10 +88,10 @@ app.post('/webhook', (req, res) => {
       }
     })
 
-    // Restituisce una risposta '200 OK' a tutti gli eventi
+    // Restituisce una risposta "200 OK" a tutti gli eventi
     res.status(200).send('EVENT_RECEIVED')
   } else {
-    // Restituisce una risposta '404 Not Found' se l'evento non proviene da una pagina
+    // Restituisce una risposta "404 Not Found" se l'evento non proviene da una pagina
     res.sendStatus(404)
   }
 })
@@ -102,11 +104,12 @@ app.post('/webhook', (req, res) => {
  */
 function _chiediProssimoDato (senderPsid) {
   return new Promise(async function (resolve, reject) {
-    var risposta
+    var messaggio = null
 
     // Se c'è, chiede il prossimo dato mancante
     if (await varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true) {
-      risposta = {
+      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT + ENUM_TIPO_INPUT_UTENTE.ATTACHMENTS
+      messaggio = {
         'attachment': {
           'type': 'template',
           'payload': {
@@ -120,11 +123,10 @@ function _chiediProssimoDato (senderPsid) {
           }
         }
       }
-      callSendAPI(senderPsid, risposta)
-      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
+      callSendAPI(senderPsid, messaggio)
       resolve(true)
     } else {
-      reject(new Error(false))
+      resolve(false)
     }
   })
     .catch(errore => {
@@ -135,17 +137,17 @@ function _chiediProssimoDato (senderPsid) {
 
 function _chiediProssimaPrenotazione (senderPsid) {
   new Promise(async function (resolve, reject) {
-    var risposta = null
+    var messaggio = null
     var datiEsame = await varConsultazioni[senderPsid].getDatiProssimoEsame()
     if (datiEsame !== null) {
-      risposta = {
-        'text': 'Ecco gli appuntamenti per l\'esame ' + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
+      messaggio = {
+        'text': "Ecco gli appuntamenti per l'esame " + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
       }
-      await callSendAPI(senderPsid, risposta)
+      await callSendAPI(senderPsid, messaggio)
 
       var listaAppuntamenti = await varConsultazioni[senderPsid].getListaDisponibilita()
       var elementi = []
-      risposta = {}
+      messaggio = {}
 
       for (var appuntamento of listaAppuntamenti) {
         var giornoDellaSettimana = appuntamento['momento'].getDay()
@@ -157,27 +159,26 @@ function _chiediProssimaPrenotazione (senderPsid) {
           'buttons': [{
             'type': 'postback',
             'title': 'Prenota',
-            'payload': appuntamento
+            'payload': 'prenotaAppuntamento ' + appuntamento['momento']
           }]
         })
       }
 
-      risposta = {
+      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
+      messaggio = {
         'attachment': {
           'type': 'template',
           'payload': {
             'template_type': 'generic',
             'elements': elementi
           }
-
         }
       }
-      await callSendAPI(senderPsid, risposta)
+      await callSendAPI(senderPsid, messaggio)
 
-      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
       resolve(true)
     } else {
-      reject(new Error(false))
+      resolve(false)
     }
   })
     .catch(errore => {
@@ -223,133 +224,328 @@ function _getNomeDaPsid (senderPsid) {
 async function handleMessage (senderPsid, receivedMessage) {
   console.log('messaggioRicevuto: ' + JSON.stringify(receivedMessage))
 
-  var risposta
-  const S_MESSAGGIO_TIPO_INPUT = 'Mi spiace ma non ho capito.'
+  var messaggio
+  var tipoDatoArrivato = null
 
   switch (true) {
-    case (await varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
-      switch (true) {
-        case (receivedMessage.quick_reply !== undefined):
-          if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-            var payload = receivedMessage.quick_reply.payload
-            varConsultazioni[senderPsid].setValoreInDato(payload)
-            tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
-          }
-          break
-
-        case (receivedMessage.attachments !== undefined):
-          // Recupera l'url dell'allegato
-          let attachmentUrl = receivedMessage.attachments[0].payload.url
-          let risposteRapide = []
-          let valoriRiconosciutiInImmagine = null
-
-          // Uso i servizi OCR per riconoscere il testo nelle foto
-          valoriRiconosciutiInImmagine = await varConsultazioni[senderPsid].getPossibiliValoriDaImmagine(attachmentUrl)
-          console.log('valoriRiconosciutiInImmagine: ' + valoriRiconosciutiInImmagine)
-          if (valoriRiconosciutiInImmagine !== null) {
-            for (var valorePotenziale of valoriRiconosciutiInImmagine) {
-              risposteRapide.push({
-                content_type: 'text',
-                title: valorePotenziale,
-                payload: valorePotenziale
-              })
-            }
-
-            risposta = {
-              text: 'Nell\'immagine ho riconosciuto i seguenti possibili valori ' + varConsultazioni[senderPsid].getProssimaProposizioneArticolata() + ' ' + varConsultazioni[senderPsid].getProssimoNomeDato() + '. Se vedi quello giusto toccalo altrimenti puoi inviarmene un\'altra foto oppure scrivermelo.',
-              quick_replies: risposteRapide
-            }
-            tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
-          } else {
-            risposta = {
-              'text': 'Non ho riconosciuto ' + varConsultazioni[senderPsid].getProssimoArticoloDeterminativo() + ' ' + varConsultazioni[senderPsid].getProssimoNomeDato() + '. Puoi riprovare a fotografarlo oppure digitarlo?'
-            }
-          }
-          await callSendAPI(senderPsid, risposta)
-          break
-
-        case (receivedMessage.text !== undefined):
-          if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.TEXT) {
-            if (varConsultazioni[senderPsid].setValoreInDato(receivedMessage.text) === false) {
-              risposta = {
-                'text': varConsultazioni[senderPsid].getFraseFormatoDatoErrato()
-              }
-              await callSendAPI(senderPsid, risposta)
-            }
-          }
-          break
-
-        default:
-          break
-      }
+    case (receivedMessage.quick_reply !== undefined):
+      tipoDatoArrivato = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
       break
 
-    case (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
-      switch (true) {
-        case (receivedMessage.quick_reply !== undefined):
-          if (tipoDatoAtteso === ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-            let payload = receivedMessage.quick_reply.payload
-            if (payload['momento']) {
-              if (await varConsultazioni[senderPsid].prenotaEsame(true) === true) {
-                risposta = {
-                  'text': 'L\'esame è stato prenotato'
-                }
-              } else {
-                risposta = {
-                  'text': 'Non sono riuscito a prenotare l\'esame'
-                }
-              }
-            } else if (payload === 'noPrenota') {
-              risposta = {
-                'text': 'Non hai prenotato'
-              }
-            }
-            await callSendAPI(senderPsid, risposta)
-          } else {
-            console.log('Mi aspettavo una quick reply')
-            risposta = {
-              'text': S_MESSAGGIO_TIPO_INPUT + ' In questo momento mi aspetto che tu tocchi una delle risposte rapide che ti ho mostrato'
-            }
-            await callSendAPI(senderPsid, risposta)
-          }
-          break
+    case (receivedMessage.attachments !== undefined):
+      tipoDatoArrivato = ENUM_TIPO_INPUT_UTENTE.ATTACHMENTS
+      break
 
-        case (receivedMessage.attachments !== undefined):
-          await _chiediProssimaPrenotazione(senderPsid)
-          break
-
-        case (receivedMessage.text !== undefined):
-          await _chiediProssimaPrenotazione(senderPsid)
-          break
-
-        default:
-          await _chiediProssimaPrenotazione(senderPsid)
-          break
-      }
+    case (receivedMessage.text !== undefined):
+      tipoDatoArrivato = ENUM_TIPO_INPUT_UTENTE.TEXT
       break
 
     default:
       break
   }
 
-  switch (true) {
-    case (await varConsultazioni[senderPsid].hasProssimoDatoDaChiedere() === true):
-      if (tipoDatoAtteso !== ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY) {
-        await _chiediProssimoDato(senderPsid)
-      }
-      break
+  if (tipoDatoAtteso.includes(tipoDatoArrivato)) {
+    switch (varConsultazioni[senderPsid].fase) {
+      case (varConsultazioni[senderPsid].ENUM_FASI.RACCOLTA_DATI):
+        switch (tipoDatoArrivato) {
+          case (ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY):
+            var payload = receivedMessage.quick_reply.payload
+            switch (payload) {
+              case ('siAltraRicetta'):
+                varConsultazioni[senderPsid].setPerProssimaRicetta()
+                if (await _chiediProssimoDato(senderPsid) === false) {
+                  varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.PRENOTAZIONE_ESAMI
+                  await _chiediProssimaPrenotazione(senderPsid)
+                }
+                break
 
-    case (await varConsultazioni[senderPsid].hasProssimoEsameDaPrenotare() === true):
-      await _chiediProssimaPrenotazione(senderPsid)
-      break
+              case ('noAltraRicetta'):
+                varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.SUGGERIMENTI
+                messaggio = {
+                  'text': 'Hai suggerimenti per migliorare questo servizio di prenotazione?',
+                  'quick_replies': [
+                    {
+                      'content_type': 'text',
+                      'title': 'Si',
+                      'payload': 'siSuggerimenti'
+                    },
+                    {
+                      'content_type': 'text',
+                      'title': 'No',
+                      'payload': 'noSuggerimenti'
+                    }
+                  ]
 
-    default:
-      risposta = {
-        'text': 'Hai prenotato tutti gli esami nella ricetta'
-      }
-      await callSendAPI(senderPsid, risposta)
-      delete varConsultazioni[senderPsid]
-      break
+                }
+                await callSendAPI(senderPsid, messaggio)
+                break
+
+              default:
+                varConsultazioni[senderPsid].setValoreInDato(payload)
+                if (await _chiediProssimoDato(senderPsid) === false) {
+                  varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.PRENOTAZIONE_ESAMI
+                  await _chiediProssimaPrenotazione(senderPsid)
+                }
+                break
+            }
+            break
+
+          case (ENUM_TIPO_INPUT_UTENTE.ATTACHMENTS):
+            let attachmentUrl = receivedMessage.attachments[0].payload.url
+            let risposteRapide = []
+            let valoriRiconosciutiInImmagine = null
+
+            // Uso i servizi OCR per riconoscere il testo nelle foto
+            valoriRiconosciutiInImmagine = await varConsultazioni[senderPsid].getPossibiliValoriDaImmagine(attachmentUrl)
+            console.log('valoriRiconosciutiInImmagine: ' + valoriRiconosciutiInImmagine)
+            if (valoriRiconosciutiInImmagine !== null) {
+              for (var valorePotenziale of valoriRiconosciutiInImmagine) {
+                risposteRapide.push({
+                  content_type: 'text',
+                  title: valorePotenziale,
+                  payload: valorePotenziale
+                })
+              }
+
+              messaggio = {
+                text: "Nell'immagine ho riconosciuto i seguenti possibili valori " + varConsultazioni[senderPsid].getProssimaProposizioneArticolata() + ' ' + varConsultazioni[senderPsid].getProssimoNomeDato() + ". Se vedi quello giusto toccalo altrimenti puoi inviarmene un'altra foto oppure scrivermelo.",
+                quick_replies: risposteRapide
+              }
+              tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
+            } else {
+              messaggio = {
+                'text': 'Non ho riconosciuto ' + varConsultazioni[senderPsid].getProssimoArticoloDeterminativo() +
+                        ' ' + varConsultazioni[senderPsid].getProssimoNomeDato() +
+                        '.\n Puoi riprovare a fotografarlo oppure digitarlo?'
+              }
+            }
+            await callSendAPI(senderPsid, messaggio)
+            break
+
+          case (ENUM_TIPO_INPUT_UTENTE.TEXT):
+            if (varConsultazioni[senderPsid].setValoreInDato(receivedMessage.text) === false) {
+              messaggio = {
+                'text': varConsultazioni[senderPsid].getFraseFormatoDatoErrato()
+              }
+              await callSendAPI(senderPsid, messaggio)
+            }
+
+            if (await _chiediProssimoDato(senderPsid) === false) {
+              varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.PRENOTAZIONE_ESAMI
+              await _chiediProssimaPrenotazione(senderPsid)
+            }
+            break
+
+          default:
+            break
+        }
+        break
+
+      case (varConsultazioni[senderPsid].ENUM_FASI.PRENOTAZIONE_ESAMI):
+        switch (tipoDatoArrivato) {
+          case (ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY):
+            let payload = receivedMessage.quick_reply.payload
+            switch (payload) {
+              case ('siPrenota'):
+                if (await varConsultazioni[senderPsid].prenotaEsame(true) === true) {
+                  messaggio = {
+                    'text': "L'esame è stato prenotato.\n" +
+                            'Il numero coupon della prenotazione è ' + Math.floor(Math.random() * 10000) + ' del ' + (new Date()).getFullYear()
+                  }
+                  await callSendAPI(senderPsid, messaggio)
+
+                  varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.EMAIL
+                  tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
+                  messaggio = {
+                    'text': 'Desideri ricevere il riepilogo della prenotazione per email?',
+                    'quick_replies': [
+                      {
+                        'content_type': 'text',
+                        'title': 'Si',
+                        'payload': 'siEmail'
+                      },
+                      {
+                        'content_type': 'text',
+                        'title': 'No',
+                        'payload': 'noEmail'
+                      }
+                    ]
+                  }
+                  await callSendAPI(senderPsid, messaggio)
+                } else {
+                  messaggio = {
+                    'text': "Non sono riuscito a prenotare l'esame"
+                  }
+                  await callSendAPI(senderPsid, messaggio)
+                }
+                break
+
+              case ('noPrenota'):
+                messaggio = {
+                  'text': 'Non hai prenotato'
+                }
+                await callSendAPI(senderPsid, messaggio)
+                break
+
+              default:
+                break
+            }
+            break
+
+          case (ENUM_TIPO_INPUT_UTENTE.ATTACHMENTS):
+            await _chiediProssimaPrenotazione(senderPsid)
+            break
+
+          case (ENUM_TIPO_INPUT_UTENTE.TEXT):
+            await _chiediProssimaPrenotazione(senderPsid)
+            break
+
+          default:
+            break
+        }
+        break
+
+      case (varConsultazioni[senderPsid].ENUM_FASI.EMAIL):
+        switch (tipoDatoArrivato) {
+          case (ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY):
+            let payload = receivedMessage.quick_reply.payload
+            switch (payload) {
+              case ('siEmail'):
+                tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
+                messaggio = {
+                  'text': 'A quale indirizzo email preferisci ricevere il riepilogo?'
+                }
+                await callSendAPI(senderPsid, messaggio)
+                break
+
+              case ('noEmail'):
+                var esito = await _chiediProssimaPrenotazione(senderPsid) // @todo La seconda condizione è solo un workaround. Capire perchè a volte restituisce undefined
+                if (esito === false || esito === undefined) {
+                  messaggio = {
+                    'text': 'Hai prenotato tutti gli esami di questa ricetta'
+                  }
+                  await callSendAPI(senderPsid, messaggio)
+
+                  varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.RACCOLTA_DATI
+                  tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
+                  messaggio = {
+                    'text': "Hai un'altra ricetta, con esami da prenotare, a nome della stessa persona?",
+                    'quick_replies': [
+                      {
+                        'content_type': 'text',
+                        'title': 'Si',
+                        'payload': 'siAltraRicetta'
+                      },
+                      {
+                        'content_type': 'text',
+                        'title': 'No',
+                        'payload': 'noAltraRicetta'
+                      }
+                    ]
+                  }
+                  await callSendAPI(senderPsid, messaggio)
+                }
+                break
+            }
+            break
+
+          case (ENUM_TIPO_INPUT_UTENTE.ATTACHMENTS):
+            break
+
+          case (ENUM_TIPO_INPUT_UTENTE.TEXT):
+            var re = new RegExp(/[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*/)
+            var indirizzoEmail = ''
+            if (re.test(receivedMessage.text)) {
+              indirizzoEmail = re.exec(receivedMessage.text)
+              messaggio = {
+                'text': "Ti ho inviato il riepilogo all'indirizzo " + indirizzoEmail
+              }
+              await callSendAPI(senderPsid, messaggio)
+
+              esito = await _chiediProssimaPrenotazione(senderPsid) // @todo La seconda condizione è solo un workaround. Capire perchè a volte restituisce undefined
+              if (esito === false || esito === undefined) {
+                messaggio = {
+                  'text': 'Hai prenotato tutti gli esami di questa ricetta'
+                }
+                await callSendAPI(senderPsid, messaggio)
+
+                varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.RACCOLTA_DATI
+                tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
+                messaggio = {
+                  'text': "Hai un'altra ricetta, con esami da prenotare, a nome della stessa persona?",
+                  'quick_replies': [
+                    {
+                      'content_type': 'text',
+                      'title': 'Si',
+                      'payload': 'siAltraRicetta'
+                    },
+                    {
+                      'content_type': 'text',
+                      'title': 'No',
+                      'payload': 'noAltraRicetta'
+                    }
+                  ]
+                }
+                await callSendAPI(senderPsid, messaggio)
+              }
+            } else {
+              tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
+              messaggio = {
+                'text': 'Questo indirizzo email non ha la giusta forma. Potresti verificare e reinviarmelo?'
+              }
+              await callSendAPI(senderPsid, messaggio)
+            }
+
+            break
+
+          default:
+            break
+        }
+        break
+
+      case (varConsultazioni[senderPsid].ENUM_FASI.SUGGERIMENTI):
+        switch (tipoDatoArrivato) {
+          case (ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY):
+            let payload = receivedMessage.quick_reply.payload
+            switch (payload) {
+              case ('siSuggerimenti'):
+                tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
+                messaggio = {
+                  'text': 'Quali sono?'
+                }
+                await callSendAPI(senderPsid, messaggio)
+                break
+
+              case ('noSuggerimenti'):
+                messaggio = {
+                  'text': 'Grazie per avermi contattato'
+                }
+                await callSendAPI(senderPsid, messaggio)
+                delete varConsultazioni[senderPsid]
+                break
+            }
+            break
+
+          case (ENUM_TIPO_INPUT_UTENTE.ATTACHMENTS):
+            break
+
+          case (ENUM_TIPO_INPUT_UTENTE.TEXT):
+            messaggio = {
+              'text': 'Grazie per avermi contattato'
+            }
+            await callSendAPI(senderPsid, messaggio)
+            delete varConsultazioni[senderPsid]
+            break
+
+          default:
+            break
+        }
+    }
+  } else {
+    messaggio = {
+      'text': 'In questo momento non mi aspetto questo tipo di risposta'
+    }
+    await callSendAPI(senderPsid, messaggio)
   }
 }
 
@@ -360,7 +556,7 @@ async function handleMessage (senderPsid, receivedMessage) {
  */
 async function handlePostback (senderPsid, receivedPostback) {
   console.log('Entrato in handlePostback()')
-  let risposta
+  let messaggio
 
   // Recupera il payload del postback
   let payload = receivedPostback.payload
@@ -368,43 +564,42 @@ async function handlePostback (senderPsid, receivedPostback) {
   // Imposta la risposta basata sul payload del postback
   if (payload === 'inizia') {
     varConsultazioni[senderPsid] = new Consultazione()
+    varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.RACCOLTA_DATI
 
     var debug = false
     if (debug === true) {
       await varConsultazioni[senderPsid].setValoreInDato('PCCFNC88C20F262P')
       await varConsultazioni[senderPsid].setValoreInDato('12345678901234567890')
+      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
       await handleMessage(senderPsid, {'text': '160A41234567890'})
     } else {
-      var sTesto = 'Ciao ' + await _getNomeDaPsid(senderPsid)
-
-      risposta = {
-        'text': sTesto
+      messaggio = {
+        'text': 'Ciao ' + await _getNomeDaPsid(senderPsid)
       }
-      await callSendAPI(senderPsid, risposta)
+      await callSendAPI(senderPsid, messaggio)
 
-      sTesto = 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' + varConsultazioni[senderPsid].getListaDati()
-      risposta = {
-        'text': sTesto
+      messaggio = {
+        'text': 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' +
+                varConsultazioni[senderPsid].getListaDati()
       }
-      await callSendAPI(senderPsid, risposta)
+      await callSendAPI(senderPsid, messaggio)
 
       _chiediProssimoDato(senderPsid)
     }
-  } else if (payload['presidio'] !== undefined) {
-    sTesto = 'Note ed Avvertenze:\n' + await varConsultazioni[senderPsid].getNoteAvvertenze()
-    risposta = {
-      'text': sTesto
+  } else if (payload.includes('prenotaAppuntamento')) {
+    messaggio = {
+      'text': 'Note ed Avvertenze:\n' + await varConsultazioni[senderPsid].getNoteAvvertenze()
     }
-    await callSendAPI(senderPsid, risposta)
+    await callSendAPI(senderPsid, messaggio)
 
-    sTesto = 'Confermi la prenotazione?'
-    risposta = {
-      'text': sTesto,
+    tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
+    messaggio = {
+      'text': 'Confermi la prenotazione?',
       'quick_replies': [
         {
           'content_type': 'text',
           'title': 'Si',
-          'payload': payload
+          'payload': 'siPrenota'
         },
         {
           'content_type': 'text',
@@ -413,15 +608,13 @@ async function handlePostback (senderPsid, receivedPostback) {
         }
       ]
     }
-    await callSendAPI(senderPsid, risposta)
-
-    tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
+    await callSendAPI(senderPsid, messaggio)
   } else {
-    risposta = {
+    messaggio = {
       'text': 'Mi spiace ma non ho capito'
     }
 
-    await callSendAPI(senderPsid, risposta)
+    await callSendAPI(senderPsid, messaggio)
   }
 }
 
@@ -431,7 +624,7 @@ async function handlePostback (senderPsid, receivedPostback) {
  *
  * @param {*} risposta La risposta da inviare all'interlocutore del bot
  */
-function callSendAPI (senderPsid, risposta) {
+function callSendAPI (senderPsid, messaggio) {
   console.log('Entrato in CallSendApi')
 
   return new Promise((resolve, reject) => {
@@ -440,7 +633,7 @@ function callSendAPI (senderPsid, risposta) {
       'recipient': {
         'id': senderPsid
       },
-      'message': risposta
+      'message': messaggio
     }
 
     // Invia la richiesta HTTP alla piattaforma messenger

@@ -164,7 +164,7 @@ function _chiediProssimaPrenotazione (senderPsid) {
         })
       }
 
-      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
+      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK + ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
       messaggio = {
         'attachment': {
           'type': 'template',
@@ -175,6 +175,31 @@ function _chiediProssimaPrenotazione (senderPsid) {
         }
       }
       await callSendAPI(senderPsid, messaggio)
+
+      messaggio = {
+        'text': 'Se vuoi puoi filtrare per',
+        'quick_replies': [
+          {
+            'content_type': 'text',
+            'title': 'Giorno',
+            'payload': 'filtroGiorno'
+          },
+          {
+            'content_type': 'text',
+            'title': 'Città',
+            'payload': 'filtroCitta'
+          },
+          {
+            'content_type': 'text',
+            'title': 'Presidio',
+            'payload': 'filtroPresidio'
+          },
+        ]
+
+      }
+      await callSendAPI(senderPsid, messaggio)
+
+
 
       resolve(true)
     } else {
@@ -385,6 +410,7 @@ async function handleMessage (senderPsid, receivedMessage) {
                   'text': 'Non hai prenotato'
                 }
                 await callSendAPI(senderPsid, messaggio)
+                await _chiediProssimaPrenotazione(senderPsid)
                 break
 
               default:
@@ -548,7 +574,6 @@ async function handleMessage (senderPsid, receivedMessage) {
     await callSendAPI(senderPsid, messaggio)
   }
 }
-
 
 /**
  * Gestisce gli eventi messaging_postbacks
