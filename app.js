@@ -126,7 +126,7 @@ function _chiediProssimoDato (senderPsid) {
       tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
       resolve(true)
     } else {
-      reject(new Error(false))
+      resolve(false)
     }
   })
     .catch(errore => {
@@ -179,7 +179,7 @@ function _chiediProssimaPrenotazione (senderPsid) {
       tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
       resolve(true)
     } else {
-      reject(new Error(false))
+      resolve(false)
     }
   })
     .catch(errore => {
