@@ -55,6 +55,7 @@ class Consultazione {
 
   setPerProssimaRicetta () {
     this._arrDati[2] = new NumeroRicettaElettronica()
+    this._ultimiEsamiEstrattiDaRicetta = null
   }
 
   /**
