@@ -133,53 +133,53 @@ function _chiediProssimoDato (senderPsid) {
       console.error(errore)
       return false
     })
-  }
-  
-  function _chiediProssimaPrenotazione (senderPsid) {
-    new Promise(async function (resolve, reject) {
-      var messaggio = null
-      var datiEsame = await varConsultazioni[senderPsid].getDatiProssimoEsame()
-      if (datiEsame !== null) {
-        messaggio = {
-          'text': "Ecco gli appuntamenti per l'esame " + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
-        }
-        await callSendAPI(senderPsid, messaggio)
-        
-        var listaAppuntamenti = await varConsultazioni[senderPsid].getListaDisponibilita()
-        var elementi = []
-        messaggio = {}
-        
-        for (var appuntamento of listaAppuntamenti) {
-          var giornoDellaSettimana = appuntamento['momento'].getDay()
-          const nomiGiorniSettimana = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
-          
-          elementi.push({
-            'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
-            'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
-            'buttons': [{
-              'type': 'postback',
-              'title': 'Prenota',
-              'payload': 'prenotaAppuntamento ' + appuntamento['momento']
-            }]
-          })
-        }
-        
-        tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
-        messaggio = {
-          'attachment': {
-            'type': 'template',
-            'payload': {
-              'template_type': 'generic',
-              'elements': elementi
-            }
+}
+
+function _chiediProssimaPrenotazione (senderPsid) {
+  new Promise(async function (resolve, reject) {
+    var messaggio = null
+    var datiEsame = await varConsultazioni[senderPsid].getDatiProssimoEsame()
+    if (datiEsame !== null) {
+      messaggio = {
+        'text': "Ecco gli appuntamenti per l'esame " + datiEsame['decrProdPrest'] + ' con codici ' + datiEsame['codProdPrest'] + ' (' + datiEsame['codCatalogoPrescr'] + ')'
+      }
+      await callSendAPI(senderPsid, messaggio)
+
+      var listaAppuntamenti = await varConsultazioni[senderPsid].getListaDisponibilita()
+      var elementi = []
+      messaggio = {}
+
+      for (var appuntamento of listaAppuntamenti) {
+        var giornoDellaSettimana = appuntamento['momento'].getDay()
+        const nomiGiorniSettimana = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
+
+        elementi.push({
+          'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
+          'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
+          'buttons': [{
+            'type': 'postback',
+            'title': 'Prenota',
+            'payload': 'prenotaAppuntamento ' + appuntamento['momento']
+          }]
+        })
+      }
+
+      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
+      messaggio = {
+        'attachment': {
+          'type': 'template',
+          'payload': {
+            'template_type': 'generic',
+            'elements': elementi
           }
         }
-        await callSendAPI(senderPsid, messaggio)
-
-        resolve(true)
-      } else {
-        resolve(false)
       }
+      await callSendAPI(senderPsid, messaggio)
+
+      resolve(true)
+    } else {
+      resolve(false)
+    }
   })
     .catch(errore => {
       console.error(errore)
@@ -418,7 +418,7 @@ async function handleMessage (senderPsid, receivedMessage) {
               break
 
             case ('noEmail'):
-              var esito = await _chiediProssimaPrenotazione(senderPsid) //@todo La seconda condizione è solo un workaround. Capire perchè a volte restituisce undefined
+              var esito = await _chiediProssimaPrenotazione(senderPsid) // @todo La seconda condizione è solo un workaround. Capire perchè a volte restituisce undefined
               if (esito === false || esito === undefined) {
                 messaggio = {
                   'text': 'Hai prenotato tutti gli esami di questa ricetta'
@@ -461,7 +461,7 @@ async function handleMessage (senderPsid, receivedMessage) {
             }
             await callSendAPI(senderPsid, messaggio)
 
-            var esito = await _chiediProssimaPrenotazione(senderPsid) //@todo La seconda condizione è solo un workaround. Capire perchè a volte restituisce undefined
+            esito = await _chiediProssimaPrenotazione(senderPsid) // @todo La seconda condizione è solo un workaround. Capire perchè a volte restituisce undefined
             if (esito === false || esito === undefined) {
               messaggio = {
                 'text': 'Hai prenotato tutti gli esami di questa ricetta'
@@ -539,10 +539,10 @@ async function handleMessage (senderPsid, receivedMessage) {
         default:
           break
       }
-    }
   }
+}
 
-//@todo urgente meccanismo di controllo del tipo di risposta inserito dall'utente.
+// @todo urgente meccanismo di controllo del tipo di risposta inserito dall'utente.
 /*   if (tipoDatoArrivato === tipoDatoAtteso) {
   } else {
     messaggio = {
@@ -551,7 +551,6 @@ async function handleMessage (senderPsid, receivedMessage) {
     await callSendAPI(senderPsid, messaggio)
   }
  */
-
 
 /**
  * Gestisce gli eventi messaging_postbacks
@@ -613,7 +612,6 @@ async function handlePostback (senderPsid, receivedPostback) {
       ]
     }
     await callSendAPI(senderPsid, messaggio)
-
   } else {
     messaggio = {
       'text': 'Mi spiace ma non ho capito'
