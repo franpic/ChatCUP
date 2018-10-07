@@ -457,7 +457,7 @@ async function handleMessage (senderPsid, receivedMessage) {
             if (re.test(receivedMessage.text)) {
               indirizzoEmail = re.exec(receivedMessage.text)
               messaggio = {
-                'text': "Ti ho inviato una mail all'indirizzo " + indirizzoEmail
+                'text': "Ti ho inviatoil riepilogo all'indirizzo " + indirizzoEmail
               }
               await callSendAPI(senderPsid, messaggio)
 
@@ -563,11 +563,12 @@ async function handlePostback (senderPsid, receivedPostback) {
   if (payload === 'inizia') {
     varConsultazioni[senderPsid] = new Consultazione()
     varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.RACCOLTA_DATI
-
+    
     var debug = false
     if (debug === true) {
       await varConsultazioni[senderPsid].setValoreInDato('PCCFNC88C20F262P')
       await varConsultazioni[senderPsid].setValoreInDato('12345678901234567890')
+      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT
       await handleMessage(senderPsid, {'text': '160A41234567890'})
     } else {
       messaggio = {
@@ -576,7 +577,8 @@ async function handlePostback (senderPsid, receivedPostback) {
       await callSendAPI(senderPsid, messaggio)
 
       messaggio = {
-        'text': 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' + varConsultazioni[senderPsid].getListaDati()
+        'text': 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' + 
+                varConsultazioni[senderPsid].getListaDati()
       }
       await callSendAPI(senderPsid, messaggio)
 
