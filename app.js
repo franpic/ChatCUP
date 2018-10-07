@@ -424,7 +424,7 @@ async function handleMessage (senderPsid, receivedMessage) {
                   }
                   await callSendAPI(senderPsid, messaggio)
 
-                  varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].RACCOLTA_DATI
+                  varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.RACCOLTA_DATI
                   tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
                   messaggio = {
                     'text': "Hai un'altra ricetta, con esami da prenotare, a nome della stessa persona?",
@@ -467,7 +467,7 @@ async function handleMessage (senderPsid, receivedMessage) {
                 }
                 await callSendAPI(senderPsid, messaggio)
 
-                varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].RACCOLTA_DATI
+                varConsultazioni[senderPsid].fase = varConsultazioni[senderPsid].ENUM_FASI.RACCOLTA_DATI
                 tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
                 messaggio = {
                   'text': "Hai un'altra ricetta, con esami da prenotare, a nome della stessa persona?",
