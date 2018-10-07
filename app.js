@@ -431,7 +431,7 @@ async function handleMessage (senderPsid, receivedMessage) {
                       {
                         'content_type': 'text',
                         'title': 'Si',
-                        'payload': 'siAltriRicetta'
+                        'payload': 'siAltraRicetta'
                       },
                       {
                         'content_type': 'text',
@@ -476,7 +476,6 @@ async function handleMessage (senderPsid, receivedMessage) {
                       'content_type': 'text',
                       'title': 'Si',
                       'payload': 'siAltraRicetta'
-                      
                     },
                     {
                       'content_type': 'text',
