@@ -290,7 +290,7 @@ async function handleMessage (senderPsid, receivedMessage) {
             }
             break
 
-          case (tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.TEXT + ENUM_TIPO_INPUT_UTENTE.ATTACHMENTS):
+          case (ENUM_TIPO_INPUT_UTENTE.ATTACHMENTS):
             let attachmentUrl = receivedMessage.attachments[0].payload.url
             let risposteRapide = []
             let valoriRiconosciutiInImmagine = null
