@@ -144,7 +144,7 @@ class WebServicesHCup {
    * @param {*} orarioInizio
    * @param {*} orarioFine
    */
-  _getAppuntamentoCasuale (dataInizio, dataFine, orarioInizio, orarioFine, citta, presidio) {
+  _getAppuntamentoCasuale (dataInizio, orarioInizio, orarioFine, citta, presidio) {
     var appuntamento = {
       'momento': '',
       'presidio': {
@@ -154,6 +154,12 @@ class WebServicesHCup {
     }
 
     var numPresidioELocalita = Math.floor(Math.random() * 10) + 1
+
+    var dataLimite = new Date(ultimaDataPresa)
+    dataLimite.setDate(dataLimite.getDate() + 10)
+
+    const orarioInizio = 8
+    const orarioFine = 20
 
     appuntamento['momento'] = new Date(dataInizio.getTime() + Math.random() * (dataFine.getTime() - dataInizio.getTime()))
     appuntamento['momento'].setHours(orarioInizio + Math.random() * (orarioFine - orarioInizio))
@@ -185,13 +191,11 @@ class WebServicesHCup {
     return new Promise(function (resolve, reject) {
       const numAppuntamentiDaRestituire = Math.floor(Math.random() * 10) + 1
       var ultimaDataPresa = new Date(Number(data.substr(6, 4)), Number(data.substr(3, 2)), Number(data.substr(0, 2)))
-      var dataLimite = new Date(ultimaDataPresa)
-      dataLimite.setDate(dataLimite.getDate() + 10)
 
       var appuntamentiDaRestituire = []
 
       for (var i = 0; i < numAppuntamentiDaRestituire; i++) {
-        var ultimoAppuntamento = t._getAppuntamentoCasuale(ultimaDataPresa, dataLimite, 8, 20, citta, presidio)
+        var ultimoAppuntamento = t._getAppuntamentoCasuale(ultimaDataPresa, citta, presidio)
         ultimaDataPresa = ultimoAppuntamento['momento']
         appuntamentiDaRestituire.push(ultimoAppuntamento)
       }
