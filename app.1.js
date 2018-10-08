@@ -154,7 +154,7 @@ function _chiediProssimaPrenotazione (senderPsid) {
         const nomiGiorniSettimana = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
 
         elementi.push({
-          'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].toLocaleDateString() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
+          'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].getDate() + '/' + (appuntamento['momento'].getMonth() + 1) + '/' + appuntamento['momento'].getFullYear() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
           'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
           'buttons': [{
             'type': 'postback',
@@ -164,7 +164,7 @@ function _chiediProssimaPrenotazione (senderPsid) {
         })
       }
 
-      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK
+      tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.POSTBACK + ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
       messaggio = {
         'attachment': {
           'type': 'template',
@@ -173,6 +173,34 @@ function _chiediProssimaPrenotazione (senderPsid) {
             'elements': elementi
           }
         }
+      }
+      await callSendAPI(senderPsid, messaggio)
+
+      messaggio = {
+        'text': 'Toccando uno dei seguenti comandi puoi filtrare la lista appena mostrata o azzerare i filtri presenti',
+        'quick_replies': [
+          {
+            'content_type': 'text',
+            'title': 'Azzera Filtri',
+            'payload': 'filtroAzzera'
+          },
+          {
+            'content_type': 'text',
+            'title': 'Filtra da Data',
+            'payload': 'filtroData'
+          },
+          {
+            'content_type': 'text',
+            'title': 'Filtra per Città',
+            'payload': 'filtroCitta'
+          },
+          {
+            'content_type': 'text',
+            'title': 'Filtra per Presidio',
+            'payload': 'filtroPresidio'
+          }
+        ]
+
       }
       await callSendAPI(senderPsid, messaggio)
 
@@ -385,6 +413,18 @@ async function handleMessage (senderPsid, receivedMessage) {
                   'text': 'Non hai prenotato'
                 }
                 await callSendAPI(senderPsid, messaggio)
+                await _chiediProssimaPrenotazione(senderPsid)
+                break
+
+              case ('filtroData'):
+                break
+
+              case ('filtroCitta'):
+
+                break
+
+              case ('filtroPresidio'):
+
                 break
 
               default:

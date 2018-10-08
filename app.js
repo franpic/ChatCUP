@@ -416,6 +416,10 @@ async function handleMessage (senderPsid, receivedMessage) {
                 await _chiediProssimaPrenotazione(senderPsid)
                 break
 
+              case ('filtroAzzera'):
+                
+                break
+
               case ('filtroData'):
                 break
 
@@ -619,7 +623,7 @@ async function handlePostback (senderPsid, receivedPostback) {
       await callSendAPI(senderPsid, messaggio)
 
       messaggio = {
-        'text': 'Per permetterti di consultare gli appuntamenti ho bisogno dei seguenti dati:\n' +
+        'text': 'Per effettuare una prenotazione assicurati di essere in possesso di:\n' +
                 varConsultazioni[senderPsid].getListaDati()
       }
       await callSendAPI(senderPsid, messaggio)
