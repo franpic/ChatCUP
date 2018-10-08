@@ -167,13 +167,13 @@ class WebServicesHCup {
     appuntamento['momento'].setHours(orarioInizio + Math.random() * (orarioFine - orarioInizio))
 
     if (citta === '') {
-      appuntamento['presidio']['localitaPresidio'] = jsonAnagrafePresidiPuglia[numCasualePresidio]['DENOMINAZIONE_STRUTTURA']
+      appuntamento['presidio']['localitaPresidio'] = jsonAnagrafePresidiPuglia[numCasualePresidio]['COMUNE_SEDE']
     } else {
       appuntamento['presidio']['localitaPresidio'] = citta
     }
 
     if (presidio === '') {
-      appuntamento['presidio']['nomePresidio'] = jsonAnagrafePresidiPuglia[numCasualePresidio]['COMUNE_SEDE']
+      appuntamento['presidio']['nomePresidio'] = jsonAnagrafePresidiPuglia[numCasualePresidio]['DENOMINAZIONE_STRUTTURA']
     } else {
       appuntamento['presidio']['nomePresidio'] = presidio
     }
