@@ -191,7 +191,7 @@ class WebServicesHCup {
     var t = this
 
     return new Promise(function (resolve, reject) {
-      const numAppuntamentiDaRestituire = Math.floor(Math.random() * 10) + 1
+      const numAppuntamentiDaRestituire = 10
       var dData = null
 
       if (data === '') {
