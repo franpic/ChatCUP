@@ -155,7 +155,7 @@ class WebServicesHCup {
 
     const jsonAnagrafePresidiPuglia = require('../../../../../originiDati/anagrafePresidiPuglia2016.json')
     const numPresidi = Object.keys(jsonAnagrafePresidiPuglia).length
-    const numCasualePresidio = Math.random(numPresidi)
+    const numCasualePresidio = Math.floor(Math.random(numPresidi))
 
     var dataFine = new Date(dataInizio)
     dataFine.setDate(dataFine.getDate() + 10)
