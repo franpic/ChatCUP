@@ -152,11 +152,10 @@ class WebServicesHCup {
         'localitaPresidio': ''
       }
     }
-    
+
     const jsonAnagrafePresidiPuglia = require('../../../../../originiDati/anagrafePresidiPuglia2016.json')
     const numPresidi = Object.keys(jsonAnagrafePresidiPuglia).length
     const numCasualePresidio = Math.random(numPresidi)
-
 
     var dataFine = new Date(dataInizio)
     dataFine.setDate(dataFine.getDate() + 10)
@@ -168,13 +167,13 @@ class WebServicesHCup {
     appuntamento['momento'].setHours(orarioInizio + Math.random() * (orarioFine - orarioInizio))
 
     if (citta === '') {
-      appuntamento['presidio']['localitaPresidio'] = jsonAnagrafePresidiPuglia[numCasualePresidio]["DENOMINAZIONE_STRUTTURA"]
+      appuntamento['presidio']['localitaPresidio'] = jsonAnagrafePresidiPuglia[numCasualePresidio]['DENOMINAZIONE_STRUTTURA']
     } else {
       appuntamento['presidio']['localitaPresidio'] = citta
     }
 
     if (presidio === '') {
-      appuntamento['presidio']['nomePresidio'] = jsonAnagrafePresidiPuglia[numCasualePresidio]["COMUNE_SEDE"]
+      appuntamento['presidio']['nomePresidio'] = jsonAnagrafePresidiPuglia[numCasualePresidio]['COMUNE_SEDE']
     } else {
       appuntamento['presidio']['nomePresidio'] = presidio
     }

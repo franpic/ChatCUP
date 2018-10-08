@@ -365,7 +365,7 @@ class Dato {
           }
         }
       }
-      
+
       resolve(valorePresunto)
     })
       .catch(errore => {

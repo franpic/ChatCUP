@@ -417,7 +417,7 @@ async function handleMessage (senderPsid, receivedMessage) {
                 break
 
               case ('filtroAzzera'):
-                
+
                 break
 
               case ('filtroData'):

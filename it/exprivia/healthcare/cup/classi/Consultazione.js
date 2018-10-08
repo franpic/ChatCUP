@@ -84,7 +84,7 @@ class Consultazione {
   }
 
   getListaDocumenti () {
-    let lista = '- Tessera Sanitaria\n' + 
+    let lista = '- Tessera Sanitaria\n' +
                 '- Ricetta Elettronica'
 
     return lista
