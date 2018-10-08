@@ -177,11 +177,11 @@ function _chiediProssimaPrenotazione (senderPsid) {
       await callSendAPI(senderPsid, messaggio)
 
       messaggio = {
-        'text': 'Toccando uno dei seguenti comandi puoi filtrare la lista appena mostrata o azzerare i filtri presenti',
+        'text': 'Toccando uno dei seguenti comandi potrai visionare gli appuntamenti successivi o filtrarli',
         'quick_replies': [
           {
             'content_type': 'text',
-            'title': 'Azzera Filtri',
+            'title': '',
             'payload': 'filtroAzzera'
           },
           {
