@@ -195,7 +195,7 @@ class WebServicesHCup {
       var appuntamentiDaRestituire = []
 
       for (var i = 0; i < numAppuntamentiDaRestituire; i++) {
-        var ultimoAppuntamento = t._getAppuntamentoCasuale(ultimaDataPresa, citta, presidio)
+        var ultimoAppuntamento = t._getAppuntamentoCasuale(data, citta, presidio)
         ultimaDataPresa = ultimoAppuntamento['momento']
         appuntamentiDaRestituire.push(ultimoAppuntamento)
       }
