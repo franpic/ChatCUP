@@ -384,22 +384,18 @@ class Dato {
     var t = this
     var valorePresunto = null
     return new Promise(async function (resolve, reject) {
-      valorePresunto = await t._getValoreDaImmagineCodiceABarreConVdZXing(percorsoImmagine)
+      valorePresunto = await t._getValoriDaTesto(await t._getTestoDaImmagineConAzureOCR(percorsoImmagine))
       if (valorePresunto === null) {
         valorePresunto = await t._getValoriDaTesto(await t._getTestoDaImmagineConVdTesseract(percorsoImmagine))
         if (valorePresunto === null) {
-          valorePresunto = await t._getValoriDaTesto(await t._getTestoDaImmagineConAzureOCR(percorsoImmagine))
+          valorePresunto = await t._getValoreDaImmagineCodiceABarreConVdZXing(percorsoImmagine)
           if (valorePresunto === null) {
             reject(new Error(null))
-          } else {
-            resolve(valorePresunto)
           }
-        } else {
-          resolve(valorePresunto)
         }
-      } else {
-        resolve(valorePresunto)
       }
+      
+      resolve(valorePresunto)
     })
       .catch(errore => {
         return null
