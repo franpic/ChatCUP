@@ -339,7 +339,7 @@ async function handleMessage (senderPsid, receivedMessage) {
                 text: "Nell'immagine ho riconosciuto i seguenti possibili valori " + varConsultazioni[senderPsid].getProssimaProposizioneArticolata() + ' ' + varConsultazioni[senderPsid].getProssimoNomeDato() + ". Se vedi quello giusto toccalo altrimenti puoi inviarmene un'altra foto oppure scrivermelo.",
                 quick_replies: risposteRapide
               }
-              tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY
+              tipoDatoAtteso = ENUM_TIPO_INPUT_UTENTE.QUICK_REPLY + ENUM_TIPO_INPUT_UTENTE.TEXT + ENUM_TIPO_INPUT_UTENTE.ATTACHMENTS
             } else {
               messaggio = {
                 'text': 'Non ho riconosciuto ' + varConsultazioni[senderPsid].getProssimoArticoloDeterminativo() +
