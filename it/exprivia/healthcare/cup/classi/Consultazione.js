@@ -29,8 +29,9 @@ class Consultazione {
       SUGGERIMENTI: 'suggerimenti'
     })
     this.fase = null
+    this.data = new Date()
     this.filtriAppuntamenti = {
-      'date': '',
+      'data': data.getDate() + '/' + (data.getMonth() + 1) + '/' + data.getFullYear(),
       'citta': '',
       'presidio': ''
     }
@@ -62,7 +63,7 @@ class Consultazione {
     this._arrDati[2] = new NumeroRicettaElettronica()
     this._ultimiEsamiEstrattiDaRicetta = null
     this.filtriAppuntamenti = {
-      'date': '',
+      'data': '',
       'citta': '',
       'presidio': ''
     }
@@ -335,7 +336,7 @@ class Consultazione {
     return new Promise(async function (resolve, reject) {
       const varWebServicesHCup = new WebServicesHCup()
       var codCatalogoPrescr = ''
-      const listaAppuntamenti = await varWebServicesHCup.getListaDisponibilita(codCatalogoPrescr, t.filtriAppuntamenti['date'], t.filtriAppuntamenti['citta'], t.filtriAppuntamenti['presidio'])
+      const listaAppuntamenti = await varWebServicesHCup.getListaDisponibilita(codCatalogoPrescr, t.filtriAppuntamenti['data'], t.filtriAppuntamenti['citta'], t.filtriAppuntamenti['presidio'])
       resolve(listaAppuntamenti)
     })
       .catch(errore => {
@@ -364,7 +365,7 @@ class Consultazione {
       return false
     } else {
       this.filtriAppuntamenti = {
-        'date': '',
+        'data': '',
         'citta': '',
         'presidio': ''
       }
