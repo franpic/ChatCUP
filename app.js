@@ -177,30 +177,24 @@ function _chiediProssimaPrenotazione (senderPsid) {
       await callSendAPI(senderPsid, messaggio)
 
       messaggio = {
-        'text': 'Toccando uno dei seguenti comandi potrai visionare gli appuntamenti successivi o filtrarli',
+        'text': 'Toccando uno dei seguenti comandi potrai visionare gli appuntamenti successivi, filtrarli o azzerarne i filtri',
         'quick_replies': [
           {
             'content_type': 'text',
-            'title': '',
-            'payload': 'filtroAzzera'
+            'title': 'Appuntamenti Successivi',
+            'payload': 'appuntamentiSuccessivi'
           },
           {
             'content_type': 'text',
-            'title': 'Filtra da Data',
-            'payload': 'filtroData'
+            'title': 'Applica filtri',
+            'payload': 'filtriMostra'
           },
           {
             'content_type': 'text',
-            'title': 'Filtra per Città',
-            'payload': 'filtroCitta'
-          },
-          {
-            'content_type': 'text',
-            'title': 'Filtra per Presidio',
-            'payload': 'filtroPresidio'
+            'title': 'Azzera Filtri',
+            'payload': 'filtriAzzera0'
           }
         ]
-
       }
       await callSendAPI(senderPsid, messaggio)
 
