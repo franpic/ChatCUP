@@ -506,7 +506,7 @@ async function handleMessage (senderPsid, receivedMessage) {
               }
               await callSendAPI(senderPsid, messaggio)
 
-              esito = await _chiediProssimaPrenotazione(senderPsid) // @todo La seconda condizione è solo un workaround. Capire perchè a volte restituisce undefined
+              esito = await _chiediProssimaPrenotazione(senderPsid) // @todo La seconda condizione dell'if è solo un workaround. Capire perchè a volte restituisce undefined
               if (esito === false || esito === undefined) {
                 messaggio = {
                   'text': 'Hai prenotato tutti gli esami di questa ricetta'

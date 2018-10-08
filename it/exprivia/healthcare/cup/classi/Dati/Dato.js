@@ -46,35 +46,6 @@ class Dato {
     }
   }
 
-  /* set nomeDato(nome) {
-    this.nomeDato = nome
-  }
-
-  set articoloDeterminativo(articoloDeterminativo) {
-    this.articoloDeterminativo = articoloDeterminativo
-  }
-
-  set proposizioneArticolata(proposizioneArticolata) {
-    this.proposizioneArticolata = proposizioneArticolata
-  }
-
-  set percorsoImmagine(percorsoImmagine) {
-    this.percorsoImmagine = percorsoImmagine
-  }
-
-  set patternRegexAmbigua(patternRegexAmbigua) {
-    this.patternRegexAmbigua = patternRegexAmbigua
-  }
-
-  set patternRegexStretta(patternRegexStretta) {
-    this.patternRegexStretta = patternRegexStretta
-  }
-
-  set sTipiCaratteriAttesi(sTipiCaratteriAttesi) {
-    this.sTipiCaratteriAttesi = sTipiCaratteriAttesi
-  }
-  */
-
   /**
    * Restituisce il nome del dato
    */

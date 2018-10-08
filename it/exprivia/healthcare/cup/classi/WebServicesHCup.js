@@ -1,6 +1,7 @@
 'use strict'
 
 const request = require('request')
+const xmlParser = require('fast-xml-parser')
 
 class WebServicesHCup {
   constructor () {
@@ -152,8 +153,11 @@ class WebServicesHCup {
         'localitaPresidio': ''
       }
     }
+    
+    const jsonAnagrafePresidiPuglia = require('../../../../../originiDati/anagrafePresidiPuglia2016.json')
+    const numPresidi = Object.keys(jsonAnagrafePresidiPuglia).length
+    const numCasualePresidio = Math.random(numPresidi)
 
-    var numPresidioELocalita = Math.floor(Math.random() * 10) + 1
 
     var dataFine = new Date(dataInizio)
     dataFine.setDate(dataFine.getDate() + 10)
@@ -165,13 +169,13 @@ class WebServicesHCup {
     appuntamento['momento'].setHours(orarioInizio + Math.random() * (orarioFine - orarioInizio))
 
     if (citta === '') {
-      appuntamento['presidio']['localitaPresidio'] = 'Località ' + numPresidioELocalita
+      appuntamento['presidio']['localitaPresidio'] = jsonAnagrafePresidiPuglia[numCasualePresidio]["DENOMINAZIONE_STRUTTURA"]
     } else {
       appuntamento['presidio']['localitaPresidio'] = citta
     }
 
     if (presidio === '') {
-      appuntamento['presidio']['nomePresidio'] = 'Località ' + numPresidioELocalita
+      appuntamento['presidio']['nomePresidio'] = jsonAnagrafePresidiPuglia[numCasualePresidio]["COMUNE_SEDE"]
     } else {
       appuntamento['presidio']['nomePresidio'] = presidio
     }
