@@ -31,7 +31,7 @@ class Consultazione {
     this.fase = null
     this.data = new Date()
     this.filtriAppuntamenti = {
-      'data': data.getDate() + '/' + (data.getMonth() + 1) + '/' + data.getFullYear(),
+      'data': (new Date()).getDate() + '/' + ((new Date()).getMonth() + 1) + '/' + (new Date()).getFullYear(),
       'citta': '',
       'presidio': ''
     }
