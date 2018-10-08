@@ -190,13 +190,19 @@ class WebServicesHCup {
 
     return new Promise(function (resolve, reject) {
       const numAppuntamentiDaRestituire = Math.floor(Math.random() * 10) + 1
-      var ultimaDataPresa = new Date(Number(data.substr(6, 4)), Number(data.substr(3, 2)), Number(data.substr(0, 2)))
+      var dData = null
+
+      if (data === '') {
+        dData = new Date()
+      } else {
+        dData = new Date(Number(data.substr(6, 4)), Number(data.substr(3, 2)), Number(data.substr(0, 2)))
+      }
 
       var appuntamentiDaRestituire = []
 
       for (var i = 0; i < numAppuntamentiDaRestituire; i++) {
-        var ultimoAppuntamento = t._getAppuntamentoCasuale(data, citta, presidio)
-        ultimaDataPresa = ultimoAppuntamento['momento']
+        var ultimoAppuntamento = t._getAppuntamentoCasuale(dData, citta, presidio)
+        dData = ultimoAppuntamento['momento']
         appuntamentiDaRestituire.push(ultimoAppuntamento)
       }
       resolve(appuntamentiDaRestituire)
