@@ -155,8 +155,8 @@ class WebServicesHCup {
 
     var numPresidioELocalita = Math.floor(Math.random() * 10) + 1
 
-    var dataLimite = new Date(ultimaDataPresa)
-    dataLimite.setDate(dataLimite.getDate() + 10)
+    var dataFine = new Date(dataInizio)
+    dataFine.setDate(dataFine.getDate() + 10)
 
     const orarioInizio = 8
     const orarioFine = 20
