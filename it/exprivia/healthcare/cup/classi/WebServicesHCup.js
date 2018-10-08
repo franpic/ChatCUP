@@ -1,7 +1,6 @@
 'use strict'
 
 const request = require('request')
-const xmlParser = require('fast-xml-parser')
 
 class WebServicesHCup {
   constructor () {
