@@ -144,7 +144,7 @@ class WebServicesHCup {
    * @param {*} orarioInizio
    * @param {*} orarioFine
    */
-  _getAppuntamentoCasuale (dataInizio, orarioInizio, orarioFine, citta, presidio) {
+  _getAppuntamentoCasuale (dataInizio, citta, presidio) {
     var appuntamento = {
       'momento': '',
       'presidio': {
