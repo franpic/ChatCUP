@@ -155,7 +155,7 @@ function _chiediProssimaPrenotazione (senderPsid) {
 
         elementi.push({
           'title': nomiGiorniSettimana[giornoDellaSettimana].substr(0, 3) + ' ' + appuntamento['momento'].getDate() + '/' + (appuntamento['momento'].getMonth() + 1) + '/' + appuntamento['momento'].getFullYear() + ' - ' + appuntamento['momento'].toLocaleTimeString(),
-          'subtitle': appuntamento['presidio']['nomePresidio'] + ' - ' + appuntamento['presidio']['localitaPresidio'],
+          'subtitle': appuntamento['presidio']['nomePresidio'],
           'buttons': [{
             'type': 'postback',
             'title': 'Prenota',
