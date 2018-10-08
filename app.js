@@ -624,7 +624,7 @@ async function handlePostback (senderPsid, receivedPostback) {
 
       messaggio = {
         'text': 'Per effettuare una prenotazione assicurati di essere in possesso di:\n' +
-                varConsultazioni[senderPsid].getListaDati()
+                varConsultazioni[senderPsid].getListaDocumenti()
       }
       await callSendAPI(senderPsid, messaggio)
 

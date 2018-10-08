@@ -83,6 +83,13 @@ class Consultazione {
     return lista
   }
 
+  getListaDocumenti () {
+    let lista = '- Tessera Sanitaria\n' + 
+                '- Ricetta Elettronica'
+
+    return lista
+  }
+
   /**
    * Restituisce la frase di richiesta del prossimo dato da valorizzare
    *
